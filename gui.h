@@ -41,6 +41,7 @@ struct renderer {
 struct window {
     struct renderer rend;
     bool should_close;
+    bool should_redraw;
     /* X11 */
     Display *display;
     Window root;

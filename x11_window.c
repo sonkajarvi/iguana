@@ -95,11 +95,16 @@ void X11_window_poll_events(struct window *w)
         switch (event.type) {
         case ClientMessage:
             if ((Atom)event.xclient.data.l[0] == wm_delete_window) {
-                w->should_close = false;
+                w->should_close = true;
                 return;
             }
             break;
+
+        case ConfigureNotify:
+            w->should_redraw = true;
+            break;
         }
+
     }
 
     XFlush(w->display);

@@ -40,7 +40,23 @@ int window_create(struct window *w, int width, int height)
 
 int window_exec(struct window *w)
 {
-    (void)w;
+    w->show(w);
+
+    /* The window is redrawn when it changes size; this should be unnecessary. */
+    w->should_redraw = true;
+
+    while (!w->should_close) {
+        w->poll_events(w);
+
+        if (w->should_redraw) {
+            w->rend.new_frame(&w->rend, w);
+            w->rend.flush_vertices(&w->rend);
+            w->swap_buffers(w);
+
+            w->should_redraw = false;
+        }
+    }
+
     return 0;
 }
 
