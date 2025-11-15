@@ -92,6 +92,7 @@ void X11_window_swap_buffers(struct window *w)
 void X11_window_poll_events(struct window *w)
 {
     XEvent event;
+    XWindowAttributes wa;
 
     if (!w)
         return;
@@ -108,6 +109,11 @@ void X11_window_poll_events(struct window *w)
             break;
 
         case ConfigureNotify:
+            XGetWindowAttributes(w->display, w->window, &wa);
+            w->width = wa.width;
+            w->height = wa.height;
+
+            /* TODO: Update only on resize. */
             w->should_redraw = true;
             break;
         }

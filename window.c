@@ -45,22 +45,29 @@ int window_create(struct window *w, int width, int height)
     return 0;
 }
 
-int window_exec(struct window *w)
+int window_exec(struct window *win)
 {
-    w->show(w);
+    win->show(win);
 
     /* The window is redrawn when it changes size; this should be unnecessary. */
-    w->should_redraw = true;
+    win->should_redraw = true;
 
-    while (!w->should_close) {
-        w->poll_events(w);
+    while (!win->should_close) {
+        win->poll_events(win);
 
-        if (w->should_redraw) {
-            w->rend.new_frame(&w->rend, w);
-            w->rend.flush_vertices(&w->rend);
-            w->swap_buffers(w);
+        if (win->should_redraw) {
+            win->rend.new_frame(&win->rend, win);
 
-            w->should_redraw = false;
+            win->widget->x = 0;
+            win->widget->y = 0;
+            win->widget->width = win->width;
+            win->widget->height = win->height;
+            widget_update(win->widget, win);
+
+            win->rend.flush_vertices(&win->rend);
+            win->swap_buffers(win);
+
+            win->should_redraw = false;
         }
     }
 

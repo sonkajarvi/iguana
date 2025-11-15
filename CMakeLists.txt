@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(gui
+    "draw.c"
     "gl_context.c"
     "gl_renderer.c"
     "glx_context.c"

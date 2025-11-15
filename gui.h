@@ -29,6 +29,13 @@ struct vertex {
 
 struct window;
 
+struct widget {
+    int x;
+    int y;
+    int width;
+    int height;
+};
+
 struct renderer {
     /* OpenGL */
     struct vertex *v_buf;       /* Also used as the shader log buffer */
@@ -47,8 +54,11 @@ struct renderer {
 
 struct window {
     struct renderer rend;
+    struct widget *widget;
     bool should_close;
     bool should_redraw;
+    int width;
+    int height;
     /* X11 */
     Display *display;
     Window root;
@@ -67,6 +77,8 @@ struct window {
 int window_create(struct window *w, int width, int height);
 int window_exec(struct window *w);
 void window_set_color(struct window *w, float r, float g, float b);
+
+void widget_update(struct widget *wgt, struct window *win);
 
 void renderer_draw_quad(struct renderer *rend, vec3 position, vec3 scale, vec4 color);
 
