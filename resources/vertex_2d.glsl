@@ -18,8 +18,8 @@ void main()
     // v_tex_index = a_tex_index;
 
     vec2 position;
-    position.x = (a_position.x / u_window_size.x) * 2.0 - 1.0;
-    position.y = (a_position.y / u_window_size.y) * 2.0 - 1.0;
+    position.x = (a_position.x / u_window_size.x) * 2.0;
+    position.y = (a_position.y / u_window_size.y) * 2.0;
 
     gl_Position = vec4(position, 0.0, 1.0);
 }
