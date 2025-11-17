@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include <X11/X.h>
 
@@ -20,20 +21,35 @@
 #define INFO    "[info] "
 #define ERROR   "[error] "
 
+#define DEFINE_WIDGET() struct widget __base
+#define WIDGET_GET_BASE(impl) (&((impl)->__base))
+#define WIDGET_GET_IMPL(type, base)                                             \
+    ({                                                                          \
+        const typeof(((type *)NULL)->__base) *__base = (base);                  \
+        (type *)((char *)__base - offsetof(type, __base));                      \
+    })
+
 #define vec4_unwrap(v) {v[0], v[1], v[2], v[3]}
+
+struct window;
 
 struct vertex {
     vec3 position;
     vec4 color;
 };
 
-struct window;
-
 struct widget {
-    int x;
-    int y;
-    int width;
-    int height;
+    void (*recalculate_area)(struct widget *);
+    void (*redraw_widget)(struct widget *, struct window *);
+
+    struct widget *child;
+    struct widget *next;
+
+    /* Available area, set by parent. */
+    uint32_t av_x;
+    uint32_t av_y;
+    uint32_t av_width;
+    uint32_t av_height;
 };
 
 struct renderer {
@@ -77,8 +93,6 @@ struct window {
 int window_create(struct window *w, int width, int height);
 int window_exec(struct window *w);
 void window_set_color(struct window *w, float r, float g, float b);
-
-void widget_update(struct widget *wgt, struct window *win);
 
 void renderer_draw_quad(struct renderer *rend, vec3 position, vec3 scale, vec4 color);
 

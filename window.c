@@ -49,7 +49,7 @@ int window_exec(struct window *win)
 {
     win->show(win);
 
-    /* The window is redrawn when it changes size; this should be unnecessary. */
+    win->widget->recalculate_area(win->widget);
     win->should_redraw = true;
 
     while (!win->should_close) {
@@ -58,12 +58,12 @@ int window_exec(struct window *win)
         if (win->should_redraw) {
             win->rend.new_frame(&win->rend, win);
 
-            win->widget->x = 0;
-            win->widget->y = 0;
-            win->widget->width = win->width;
-            win->widget->height = win->height;
-            widget_update(win->widget, win);
+            win->widget->av_x = 0;
+            win->widget->av_y = 0;
+            win->widget->av_width = win->width;
+            win->widget->av_height = win->height;
 
+            win->widget->redraw_widget(win->widget, win);
             win->rend.flush_vertices(&win->rend);
             win->swap_buffers(win);
 
