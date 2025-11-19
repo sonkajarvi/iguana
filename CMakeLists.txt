@@ -7,14 +7,14 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(gui
-    "div.c"
-    "gl_context.c"
-    "gl_renderer.c"
-    "glx_context.c"
-    "renderer.c"
-    "util.c"
-    "window.c"
-    "x11_window.c"
+    "src/div.c"
+    "src/gl_context.c"
+    "src/gl_renderer.c"
+    "src/glx_context.c"
+    "src/renderer.c"
+    "src/util.c"
+    "src/window.c"
+    "src/x11_window.c"
 
     # glad sources
     "third_party/glad/src/gl.c"
@@ -22,6 +22,7 @@ add_library(gui
 )
 
 target_include_directories(gui PRIVATE
+    "."
     "third_party"
     "third_party/cglm/include"
     "third_party/glad/include"

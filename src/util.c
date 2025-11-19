@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 char *read_file(const char *path)
 {

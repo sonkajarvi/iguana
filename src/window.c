@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 int window_create(struct window *w, int width, int height)
 {

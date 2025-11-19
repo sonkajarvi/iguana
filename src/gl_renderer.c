@@ -11,7 +11,7 @@
 
 #include <glad/gl.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 /* Vertex buffer length, in bytes */
 #define VERTEX_BUFFER_LENGTH 4096

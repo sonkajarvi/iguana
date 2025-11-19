@@ -11,8 +11,8 @@
 #include <cglm/vec3.h>
 // #include <cglm/vec4.h>
 
-#include "div.h"
-#include "gui.h"
+#include <gui/div.h>
+#include <gui/gui.h>
 
 static void div_recalculate_area(struct widget *wgt)
 {

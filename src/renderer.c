@@ -7,7 +7,7 @@
 
 #include <cglm/affine.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 void renderer_draw_quad(struct renderer *rend, vec3 position, vec3 scale, vec4 color)
 {

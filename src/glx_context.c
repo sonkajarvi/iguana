@@ -12,7 +12,7 @@
 #include <glad/gl.h>
 #include <glad/glx.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 static int GLX_load_functions(struct window *w, int screen)
 {

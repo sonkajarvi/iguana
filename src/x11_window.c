@@ -10,7 +10,7 @@
 
 #include <X11/Xlib.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 static Atom wm_delete_window;
 

@@ -10,7 +10,7 @@
 
 #include <cglm/vec4.h>
 
-#include "gui.h"
+#include <gui/gui.h>
 
 struct div {
     DEFINE_WIDGET();
