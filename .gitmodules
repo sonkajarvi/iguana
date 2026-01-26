@@ -1,3 +1,6 @@
 [submodule "third_party/cglm"]
 	path = third_party/cglm
 	url = git@github.com:recp/cglm
+[submodule "third_party/stb"]
+	path = third_party/stb
+	url = git@github.com:nothings/stb
