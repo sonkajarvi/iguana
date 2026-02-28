@@ -5,19 +5,25 @@
  * The full license can be found in the LICENSE.txt file.
  */
 
-#ifndef __DIV_H__
-#define __DIV_H__
+#ifndef __DIV_H
+#define __DIV_H
 
-#include <cglm/vec4.h>
+#include <stdint.h>
 
-#include <gui/gui.h>
+#include <gui/widget.h>
 
 struct div {
-    DEFINE_WIDGET();
+    struct widget widget;
 
-    vec4 background_color;
+    struct widget *child;
+    uint32_t child_count;
+
+    /* styling */
+    uint32_t background_color;
 };
 
-void div_create(struct div *div);
+struct div *div_new(void);
+void div_add_child(struct div *div, struct widget *wgt);
+void div_del_child(struct div *div, struct widget *wgt);
 
-#endif /* !__DIV_H__ */
+#endif /* !__DIV_H */

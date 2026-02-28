@@ -8,13 +8,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(gui
     "src/div.c"
-    "src/gl_context.c"
-    "src/gl_renderer.c"
-    "src/glx_context.c"
-    "src/renderer.c"
-    "src/util.c"
-    "src/window.c"
-    "src/x11_window.c"
 
     # glad sources
     "third_party/glad/src/gl.c"
