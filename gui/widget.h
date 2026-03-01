@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 #define WIDGET_RELAYOUT(wgt)        ((wgt)->relayout(wgt))
-// #define WIDGET_REPAINT(wgt, wnd)    ((wgt)->repaint((wgt), (wnd)))
+#define WIDGET_REPAINT(wgt)         ((wgt)->repaint(wgt))
 #define WIDGET_FREE(wgt)            ((wgt)->free(wgt))
 #define WIDGET_PRINT(wgt)           ((wgt)->print(wgt))
 
@@ -29,11 +29,13 @@
  * @next: See above.
  * @name: Name of the widget.
  * @relayout: Called to recalculate the layout of the widget and its children.
+ * @repaint: Called to redraw the widget.
  * @free: Called to free all allocated resources owned by the widget.
  * @print: Called to output information about the widget, and optionally, its
  *         children, to the console.
  */
 struct widget {
+    struct window *window;
     struct widget *parent;
     struct widget *prev, *next;
 
@@ -41,7 +43,7 @@ struct widget {
     uint32_t x, y, width, height;
 
     void (*relayout)(struct widget *);
-    // void (*repaint)(struct widget *);
+    void (*repaint)(struct widget *);
     void (*free)(struct widget *);
     void (*print)(struct widget *);
 };

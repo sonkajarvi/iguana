@@ -13,14 +13,19 @@
 #include <gui/color.h>
 #include <gui/div.h>
 #include <gui/widget.h>
+#include <gui/window.h>
+
+#include "internal.h"
 
 static void __div_relayout(struct widget *wgt);
+static void __div_repaint(struct widget *wgt);
 static void __div_free(struct widget *wgt);
 static void __div_print(struct widget *wgt);
 
 static struct div __div_default = {
     .widget = {
         .relayout = __div_relayout,
+        .repaint = __div_repaint,
         .free = __div_free,
         .print = __div_print,
     },
@@ -48,6 +53,29 @@ static void __div_relayout(struct widget *wgt)
 
         x += width;
     }
+}
+
+static void __div_repaint(struct widget *wgt)
+{
+    struct div *div = __container_of(wgt, struct div, widget);
+    // struct widget *tmp, *end;
+    struct rect rect;
+    struct style style;
+
+    memset(&rect, 0, sizeof(rect));
+    rect.position[0] = wgt->x;
+    rect.position[1] = wgt->y;
+    rect.size[0] = (float)wgt->width;
+    rect.size[1] = (float)wgt->height;
+
+    memset(&style, 0, sizeof(style));
+    style.style = STYLE_FILL;
+    style.color = div->background_color;
+
+    GL_painter_draw_rect(&wgt->window->painter, &rect, &style);
+
+    if (div->child_count == 0)
+        return;
 }
 
 static void __div_free(struct widget *wgt)
