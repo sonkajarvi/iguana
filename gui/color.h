@@ -8,6 +8,8 @@
 #ifndef __GUI_COLOR
 #define __GUI_COLOR
 
+#include <stdint.h>
+
 /*
  * Colors are unsigned 32-bit integers, and are in RGBA format where the most
  * significant byte is the red channel.
@@ -16,6 +18,29 @@
 #define COLOR_G(rgba) (((rgba) >> 16) & 255)
 #define COLOR_B(rgba) (((rgba) >>  8) & 255)
 #define COLOR_A(rgba) (((rgba)      ) & 255)
+
+/**
+ * color_to_3f - Transform RGB color to three floats.
+ * @rgb: The color to transform.
+ * @out: Buffer to write to.
+ */
+static inline void color_to_3f(uint32_t rgb, float out[static 3])
+{
+    out[0] = (float)COLOR_R(rgb) / 255.0f;
+    out[1] = (float)COLOR_G(rgb) / 255.0f;
+    out[2] = (float)COLOR_B(rgb) / 255.0f;
+}
+
+/**
+ * color_to_4f - Transform RGBA color to four floats.
+ * @rgba: The color to transform.
+ * @out: Buffer to write to.
+ */
+static inline void color_to_4f(uint32_t rgba, float out[static 4])
+{
+    color_to_3f(rgba, out);
+    out[3] = (float)COLOR_A(rgba) / 255.0f;
+}
 
 /*
  * These colors are the same as the CSS named colors.
