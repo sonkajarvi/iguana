@@ -17,22 +17,7 @@
 
 #include "internal.h"
 
-static void __div_relayout(struct widget *wgt);
-static void __div_repaint(struct widget *wgt);
-static void __div_free(struct widget *wgt);
-static void __div_print(struct widget *wgt);
-
-static struct div __div_default = {
-    .widget = {
-        .relayout = __div_relayout,
-        .repaint = __div_repaint,
-        .free = __div_free,
-        .print = __div_print,
-    },
-    .background_color = COLOR_TRANSPARENT,
-};
-
-static void __div_relayout(struct widget *wgt)
+static void div_relayout(struct widget *wgt)
 {
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp, *end;
@@ -45,6 +30,9 @@ static void __div_relayout(struct widget *wgt)
     width = wgt->width / div->child_count;
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
+        /* TODO: do this elsewhere, or get it some other way */
+        tmp->window = div->widget.window;
+
         tmp->x = x;
         tmp->y = wgt->y;
         tmp->width = width;
@@ -55,10 +43,10 @@ static void __div_relayout(struct widget *wgt)
     }
 }
 
-static void __div_repaint(struct widget *wgt)
+static void div_repaint(struct widget *wgt)
 {
     struct div *div = __container_of(wgt, struct div, widget);
-    // struct widget *tmp, *end;
+    struct widget *tmp, *end;
     struct rect rect;
     struct style style;
 
@@ -76,9 +64,13 @@ static void __div_repaint(struct widget *wgt)
 
     if (div->child_count == 0)
         return;
+
+    for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
+        WIDGET_REPAINT(tmp);
+    }
 }
 
-static void __div_free(struct widget *wgt)
+static void div_free(struct widget *wgt)
 {
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp;
@@ -91,7 +83,7 @@ static void __div_free(struct widget *wgt)
     free(div);
 }
 
-static void __div_print(struct widget *wgt)
+static void div_print(struct widget *wgt)
 {
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp, *end;
@@ -106,13 +98,23 @@ static void __div_print(struct widget *wgt)
     }
 }
 
+static struct div div_default = {
+    .widget = {
+        .relayout = div_relayout,
+        .repaint = div_repaint,
+        .free = div_free,
+        .print = div_print,
+    },
+    .background_color = COLOR_TRANSPARENT,
+};
+
 struct div *div_new(void)
 {
     struct div *div = malloc(sizeof(*div));
     if (!div)
         return NULL;
 
-    memcpy(div, &__div_default, sizeof(*div));
+    memcpy(div, &div_default, sizeof(*div));
     return div;
 }
 
