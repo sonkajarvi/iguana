@@ -98,12 +98,16 @@ static void div_print(struct widget *wgt)
     }
 }
 
-static struct div div_default = {
+static const struct widget_vtable div_vtable = {
+    .relayout = div_relayout,
+    .repaint = div_repaint,
+    .free = div_free,
+    .print = div_print,
+};
+
+static const struct div div_default = {
     .widget = {
-        .relayout = div_relayout,
-        .repaint = div_repaint,
-        .free = div_free,
-        .print = div_print,
+        .vtable = &div_vtable,
     },
     .background_color = COLOR_TRANSPARENT,
 };
