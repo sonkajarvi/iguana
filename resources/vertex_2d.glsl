@@ -21,14 +21,16 @@ uniform vec2 u_WindowSize;
 
 void main()
 {
+    float offset = u_WindowSize.y - a_Size.y;
+
+    vec2 p = vec2(a_Position.x, a_Position.y + offset);
+    gl_Position = vec4(vec2(2.0 * p / u_WindowSize - 1.0), 0.0, 1.0);
+
     v_Color = a_Color;
-    v_Center = a_Center;
+    v_Center = vec2(a_Center.x, a_Center.y + offset);
     v_Size = a_Size;
     v_Radius = a_Radius;
     v_TextureCoords = a_TextureCoords;
     v_TextureIndex = a_TextureIndex;
     v_StrokeWidth = a_StrokeWidth;
-
-    vec2 p = 2.0 * a_Position / u_WindowSize;
-    gl_Position = vec4(p, 0.0, 1.0);
 }

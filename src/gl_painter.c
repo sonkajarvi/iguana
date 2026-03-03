@@ -298,86 +298,77 @@ void GL_painter_destroy(struct painter *paint)
     free(paint->v_buf);
 }
 
-#define __COLOR_TO_VEC4(c)            \
-    (vec4){                         \
-        (float)COLOR_R(c) / 255.0f, \
-        (float)COLOR_G(c) / 255.0f, \
-        (float)COLOR_B(c) / 255.0f, \
-        (float)COLOR_A(c) / 255.0f  \
-    }
-
 #define __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(i) \
-    glm_vec4_copy(c, v[i].color);                       \
-    glm_vec2_copy(rect->position, v[i].center);         \
-    glm_vec2_copy(rect->size, v[i].size);               \
-    glm_vec4_copy(r, v[i].radius);                      \
-    v[i].texture_index = tmp->index;                    \
-    v[i].stroke_width = s;
+    glm_vec4_copy(color, vertex[i].color);               \
+    glm_vec2_copy(center, vertex[i].center);             \
+    glm_vec2_copy(rect->size, vertex[i].size);           \
+    glm_vec4_copy(radius, vertex[i].radius);             \
+    vertex[i].texture_index = texture->index;            \
+    vertex[i].stroke_width = stroke;
 
 void GL_painter_draw_rect(struct painter *paint, struct rect *rect, struct style *style)
 {
-    struct vertex v[6];
-    struct texture *tmp;
-    vec4 c, r, t;       /* color, bounded radii, normalized texture coords */
-    vec2 h, p;          /* halved size, top-left */
-    float m, s;         /* smallest side length, stroke width */
+    struct vertex vertex[6];
+    struct texture *texture;
+    vec4 color, radius, tex_coords;
+    vec2 center, half;
+    float m, stroke;
 
     if (COLOR_A(style->color) == 0)
         return;
+
     if (style->style == STYLE_STROKE && style->st_width == 0.0f)
         return;
 
-    glm_vec2_copy((vec2){rect->size[0] / 2.0f, rect->size[1] / 2.0f}, h);
-    glm_vec2_copy((vec2){rect->position[0] - h[0], rect->position[1] + h[1]}, p);
+    glm_vec2_scale(rect->size, 0.5f, half);
+    glm_vec2_add(rect->position, half, center);
+    color_to_4f(style->color, color);
 
-    m = min(h[0], h[1]);
-    r[0] = min(m, rect->radius[0]);
-    r[1] = min(m, rect->radius[1]);
-    r[2] = min(m, rect->radius[2]);
-    r[3] = min(m, rect->radius[3]);
+    m = min(half[0], half[1]);
+    radius[0] = min(m, rect->radius[0]);
+    radius[1] = min(m, rect->radius[1]);
+    radius[2] = min(m, rect->radius[2]);
+    radius[3] = min(m, rect->radius[3]);
 
-    /* transform color from uint32_t to vec4 */
-    glm_vec4_copy(__COLOR_TO_VEC4(style->color), c);
+    texture = style->style == STYLE_TEXTURED_FILL ? style->tx_texture : &paint->white_texture;
+    __GL_painter_use_texture(paint, texture);
 
-    tmp = style->style == STYLE_TEXTURED_FILL ? style->tx_texture : &paint->white_texture;
-    __GL_painter_use_texture(paint, tmp);
+    tex_coords[0] = style->tx_coords[0] / texture->width;
+    tex_coords[1] = style->tx_coords[1] / texture->height;
+    tex_coords[2] = style->tx_coords[2] / texture->width + tex_coords[0];
+    tex_coords[3] = style->tx_coords[3] / texture->height + tex_coords[1];
 
-    t[0] = style->tx_coords[0] / tmp->width;
-    t[1] = style->tx_coords[1] / tmp->height;
-    t[2] = style->tx_coords[2] / tmp->width + t[0];
-    t[3] = style->tx_coords[3] / tmp->height + t[1];
-
-    s = style->style == STYLE_STROKE ? style->st_width : 0.0f;
+    stroke = style->style == STYLE_STROKE ? style->st_width : 0.0f;
 
     /* top right */
-    glm_vec2_copy((vec2){p[0] + rect->size[0] + s, p[1] + s}, v[0].position);
+    glm_vec2_copy((vec2){rect->position[0] + rect->size[0], rect->position[1]}, vertex[0].position);
     __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(0);
-    glm_vec2_copy((vec2){t[2], t[3]}, v[0].texture_coords);
+    glm_vec2_copy((vec2){tex_coords[2], tex_coords[3]}, vertex[0].texture_coords);
 
     /* bottom right */
-    glm_vec2_copy((vec2){p[0] + rect->size[0] + s, p[1] - rect->size[1] - s}, v[1].position);
+    glm_vec2_copy((vec2){rect->position[0] + rect->size[0], rect->position[1] + rect->size[1]}, vertex[1].position);
     __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(1);
-    glm_vec2_copy((vec2){t[2], t[1]}, v[1].texture_coords);
+    glm_vec2_copy((vec2){tex_coords[2], tex_coords[1]}, vertex[1].texture_coords);
 
     /* top left */
-    glm_vec2_copy((vec2){p[0] - s, p[1] + s}, v[2].position);
+    glm_vec2_copy((vec2){rect->position[0], rect->position[1]}, vertex[2].position);
     __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(2);
-    glm_vec2_copy((vec2){t[0], t[3]}, v[2].texture_coords);
+    glm_vec2_copy((vec2){tex_coords[0], tex_coords[3]}, vertex[2].texture_coords);
 
     /* bottom right */
-    glm_vec2_copy((vec2){p[0] + rect->size[0] + s, p[1] - rect->size[1] - s}, v[3].position);
+    glm_vec2_copy((vec2){rect->position[0] + rect->size[0], rect->position[1] + rect->size[1]}, vertex[3].position);
     __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(3);
-    glm_vec2_copy((vec2){t[2], t[1]}, v[3].texture_coords);
+    glm_vec2_copy((vec2){tex_coords[2], tex_coords[1]}, vertex[3].texture_coords);
 
     /* bottom left */
-    glm_vec2_copy((vec2){p[0] - s, p[1] - rect->size[1] - s}, v[4].position);
+    glm_vec2_copy((vec2){rect->position[0], rect->position[1] + rect->size[1]}, vertex[4].position);
     __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(4);
-    glm_vec2_copy((vec2){t[0], t[1]}, v[4].texture_coords);
+    glm_vec2_copy((vec2){tex_coords[0], tex_coords[1]}, vertex[4].texture_coords);
 
     /* top left */
-    glm_vec2_copy((vec2){p[0] - s, p[1] + s}, v[5].position);
+    glm_vec2_copy((vec2){rect->position[0], rect->position[1]}, vertex[5].position);
     __COPY_COLOR_CENTER_SIZE_RADIUS_TEXTURE_WIDTH(5);
-    glm_vec2_copy((vec2){t[0], t[3]}, v[5].texture_coords);
+    glm_vec2_copy((vec2){tex_coords[0], tex_coords[3]}, vertex[5].texture_coords);
 
-    __GL_painter_push_vertices(paint, v, ARRAY_SIZE(v));
+    __GL_painter_push_vertices(paint, vertex, ARRAY_SIZE(vertex));
 }

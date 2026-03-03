@@ -53,8 +53,8 @@ static void div_repaint(struct widget *wgt)
     memset(&rect, 0, sizeof(rect));
     rect.position[0] = wgt->x;
     rect.position[1] = wgt->y;
-    rect.size[0] = (float)wgt->width;
-    rect.size[1] = (float)wgt->height;
+    rect.size[0] = wgt->width;
+    rect.size[1] = wgt->height;
 
     memset(&style, 0, sizeof(style));
     style.style = STYLE_FILL;

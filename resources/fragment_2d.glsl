@@ -26,7 +26,7 @@ bool in_roundrect(vec2 point, vec2 center, vec2 size, vec4 radius)
 
 void main()
 {
-    vec2 p = gl_FragCoord.xy - u_WindowSize / 2.0;
+    vec2 p = gl_FragCoord.xy;
 
     if (v_StrokeWidth > 0.0) {
         float half = v_StrokeWidth / 2.0;
