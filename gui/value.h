@@ -72,7 +72,7 @@ static inline uint32_t value(value_t value, uint32_t rel)
         return value.value;
 
     case VALUE_TYPE_RELATIVE:
-        return rel / 100 * value.value;
+        return rel * value.value / 100;
 
     default:
         return -1;
