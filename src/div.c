@@ -97,8 +97,8 @@ static void div_print(struct widget *wgt)
     printf("div name=\"%s\" this=%p parent=%p children=%u color=%08x rect=%u,%u,%u,%u margin=%u,%u,%u,%u padding=%u,%u,%u,%u\n",
         wgt->name, div, wgt->parent, div->child_count, div->background_color,
         X(wgt->rect), Y(wgt->rect), WIDTH(wgt->rect), HEIGHT(wgt->rect),
-        TOP(wgt->margin), RIGHT(wgt->margin), BOTTOM(wgt->margin), LEFT(wgt->margin),
-        TOP(wgt->padding), RIGHT(wgt->padding), BOTTOM(wgt->padding), LEFT(wgt->padding));
+        TOP(wgt->margin).value, RIGHT(wgt->margin).value, BOTTOM(wgt->margin).value, LEFT(wgt->margin).value,
+        TOP(wgt->padding).value, RIGHT(wgt->padding).value, BOTTOM(wgt->padding).value, LEFT(wgt->padding).value);
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
         putchar('\t');

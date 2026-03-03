@@ -11,20 +11,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <gui/accessor.h>
+#include <gui/value.h>
+
 #define WIDGET_RELAYOUT(wgt)        ((wgt)->vtable->relayout(wgt))
 #define WIDGET_REPAINT(wgt)         ((wgt)->vtable->repaint(wgt))
 #define WIDGET_FREE(wgt)            ((wgt)->vtable->free(wgt))
 #define WIDGET_PRINT(wgt)           ((wgt)->vtable->print(wgt))
-
-#define X(x)            ((x)[0])
-#define Y(x)            ((x)[1])
-#define WIDTH(x)        ((x)[2])
-#define HEIGHT(x)       ((x)[3])
-
-#define TOP(x)          ((x)[0])
-#define RIGHT(x)        ((x)[1])
-#define BOTTOM(x)       ((x)[2])
-#define LEFT(x)         ((x)[3])
 
 #define __container_of(ptr, type, member)         \
     ({                                            \
@@ -54,7 +47,7 @@ struct widget {
 
     const char *name;
     rect_t rect;
-    rect_t margin, padding;
+    value4_t margin, padding;
 };
 
 /**
@@ -73,6 +66,24 @@ struct widget_vtable {
     void (*print)(struct widget *wgt);
 };
 
+/*
+ * rect_with_margin - Calculate an area, with margin applied, for painting the widget.
+ * @wgt: The widget to use.
+ * @out: The rect to write to.
+ */
+static inline void rect_with_margin(struct widget *wgt, rect_t out)
+{
+    uint32_t left, top;
+
+    left = value(LEFT(wgt->margin), WIDTH(wgt->rect));
+    top = value(TOP(wgt->margin), HEIGHT(wgt->rect));
+
+    X(out) = X(wgt->rect) + left;
+    Y(out) = Y(wgt->rect) + top;
+    WIDTH(out) = WIDTH(wgt->rect) - left - value(RIGHT(wgt->margin), WIDTH(wgt->rect));
+    HEIGHT(out) = HEIGHT(wgt->rect) - top - value(BOTTOM(wgt->margin), HEIGHT(wgt->rect));
+}
+
 /**
  * rect_with_margin_padding - Calculate an area, with margin and padding applied,
  *      for calculating the areas for the widget's children.
@@ -81,27 +92,17 @@ struct widget_vtable {
  */
 static inline void rect_with_margin_padding(struct widget *wgt, rect_t out)
 {
-    X(out) = X(wgt->rect) + LEFT(wgt->margin) + LEFT(wgt->padding);
-    Y(out) = Y(wgt->rect) + TOP(wgt->margin) + TOP(wgt->padding);
+    uint32_t left, top;
 
-    WIDTH(out) = WIDTH(wgt->rect) - LEFT(wgt->margin)
-        - RIGHT(wgt->margin) - LEFT(wgt->padding) - RIGHT(wgt->padding);
+    rect_with_margin(wgt, out);
 
-    HEIGHT(out) = HEIGHT(wgt->rect) - TOP(wgt->margin)
-        - BOTTOM(wgt->margin) - TOP(wgt->padding) - BOTTOM(wgt->padding);
-}
+    left = value(LEFT(wgt->padding), WIDTH(wgt->rect));
+    top = value(TOP(wgt->padding), HEIGHT(wgt->rect));
 
-/*
- * rect_with_margin - Calculate an area, with margin applied, for painting the widget.
- * @wgt: The widget to use.
- * @out: The rect to write to.
- */
-static inline void rect_with_margin(struct widget *wgt, rect_t out)
-{
-    X(out) = X(wgt->rect) + LEFT(wgt->margin);
-    Y(out) = Y(wgt->rect) + TOP(wgt->margin);
-    WIDTH(out) = WIDTH(wgt->rect) - LEFT(wgt->margin) - RIGHT(wgt->margin);
-    HEIGHT(out) = HEIGHT(wgt->rect) - TOP(wgt->margin) - BOTTOM(wgt->margin);
+    X(out) += left;
+    Y(out) += top;
+    WIDTH(out) -= left + value(RIGHT(wgt->padding), WIDTH(wgt->rect));
+    HEIGHT(out) -= top + value(TOP(wgt->padding), HEIGHT(wgt->rect));
 }
 
 #endif /* !__WIDGET_H */
