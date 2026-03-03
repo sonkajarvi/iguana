@@ -12,7 +12,7 @@
 
 #include <gui/window.h>
 
-#include "internal.h"
+#include "../internal.h"
 
 static void *__GL_handle = NULL;
 

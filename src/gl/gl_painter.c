@@ -15,8 +15,8 @@
 #include <gui/color.h>
 #include <gui/window.h>
 
-#include "internal.h"
-#include "utils.h"
+#include "../internal.h"
+#include "../utils.h"
 
 #define min(a, b)                \
     ({                           \
@@ -271,7 +271,7 @@ int GL_painter_create(struct painter *paint)
         sizeof(struct vertex), (void *)offsetof(struct vertex, stroke_width));
     glEnableVertexAttribArray(7);
 
-    paint->program = __GL_create_shader(paint, PROJECT_DIR "/resources/vertex_2d.glsl", PROJECT_DIR "/resources/fragment_2d.glsl");
+    paint->program = __GL_create_shader(paint, PROJECT_DIR "/src/gl/shaders/vertex_2d.glsl", PROJECT_DIR "/src/gl/shaders/fragment_2d.glsl");
     if (!paint->program) {
         free(paint->v_buf);
         return -1;

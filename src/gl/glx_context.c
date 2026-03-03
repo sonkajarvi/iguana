@@ -11,7 +11,7 @@
 
 #include <gui/window.h>
 
-#include "internal.h"
+#include "../internal.h"
 
 int GLX_load_functions(struct window *wnd, int screen)
 {

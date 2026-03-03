@@ -11,7 +11,7 @@
 
 #include <gui/window.h>
 
-#include "internal.h"
+#include "../internal.h"
 
 static Atom __X11_wm_delete_window;
 
