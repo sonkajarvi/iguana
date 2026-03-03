@@ -271,7 +271,7 @@ int GL_painter_create(struct painter *paint)
         sizeof(struct vertex), (void *)offsetof(struct vertex, stroke_width));
     glEnableVertexAttribArray(7);
 
-    paint->program = __GL_create_shader(paint, RESOURCES_PATH "/vertex_2d.glsl", RESOURCES_PATH "/fragment_2d.glsl");
+    paint->program = __GL_create_shader(paint, PROJECT_DIR "/resources/vertex_2d.glsl", PROJECT_DIR "/resources/fragment_2d.glsl");
     if (!paint->program) {
         free(paint->v_buf);
         return -1;

@@ -41,5 +41,5 @@ target_compile_options(gui PRIVATE
 )
 
 target_compile_definitions(gui PRIVATE
-    "RESOURCES_PATH=\"${CMAKE_CURRENT_SOURCE_DIR}/resources\""
+    "PROJECT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
 )
