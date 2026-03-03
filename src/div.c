@@ -89,20 +89,61 @@ static void div_free(struct widget *wgt)
     free(div);
 }
 
-static void div_print(struct widget *wgt)
+#define INDENT()                            \
+    do {                                    \
+        for (int i = 0; i < depth * 4; i++) \
+            putchar(' ');                   \
+    } while (0)
+
+#define PRINT(fmt, ...)                     \
+    do {                                    \
+        INDENT();                           \
+        printf(fmt, ##__VA_ARGS__);         \
+    } while (0)
+
+#define PRINT_VALUE(value_)                                                   \
+    do {                                                                      \
+        printf("%u", (value_).value);                                         \
+        if ((value_).value)                                                   \
+            printf("%s", (value_).type == VALUE_TYPE_ABSOLUTE ? "px" : "%"); \
+    } while (0)
+
+#define PRINT_VALUES(fmt, values)                  \
+    do {                                           \
+        INDENT();                                  \
+        printf(fmt);                               \
+        putchar(' '); PRINT_VALUE(TOP(values));    \
+        putchar(' '); PRINT_VALUE(RIGHT(values));  \
+        putchar(' '); PRINT_VALUE(BOTTOM(values)); \
+        putchar(' '); PRINT_VALUE(LEFT(values));   \
+        putchar('\n');                             \
+    } while (0)
+
+static void div_print(struct widget *wgt, int depth)
 {
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp, *end;
+    const char *color;
+    rect_t m_rect, mp_rect;
 
-    printf("div name=\"%s\" this=%p parent=%p children=%u color=%08x rect=%u,%u,%u,%u margin=%u,%u,%u,%u padding=%u,%u,%u,%u\n",
-        wgt->name, div, wgt->parent, div->child_count, div->background_color,
-        X(wgt->rect), Y(wgt->rect), WIDTH(wgt->rect), HEIGHT(wgt->rect),
-        TOP(wgt->margin).value, RIGHT(wgt->margin).value, BOTTOM(wgt->margin).value, LEFT(wgt->margin).value,
-        TOP(wgt->padding).value, RIGHT(wgt->padding).value, BOTTOM(wgt->padding).value, LEFT(wgt->padding).value);
+    rect_with_margin(wgt, m_rect);
+    rect_with_margin_padding(wgt, mp_rect);
+    color = color_to_string(div->background_color);
+
+    PRINT       ("div\n");
+    PRINT       ("  this: %p\n", div);
+    PRINT       ("  parent: %p\n", wgt->parent);
+    PRINT       ("  area: %u %u %u %u\n", X(wgt->rect), Y(wgt->rect), WIDTH(wgt->rect), HEIGHT(wgt->rect));
+    PRINT       ("        %u %u %u %u\n", X(m_rect), Y(m_rect), WIDTH(m_rect), HEIGHT(m_rect));
+    PRINT       ("        %u %u %u %u\n", X(mp_rect), Y(mp_rect), WIDTH(mp_rect), HEIGHT(mp_rect));
+    PRINT       ("  name: %s\n", wgt->name);
+    PRINT       ("  color: #%08x %s\n", div->background_color, color ?: "");
+    PRINT_VALUES("  margin:", wgt->margin);
+    PRINT_VALUES("  padding:", wgt->padding);
+    PRINT       ("  children: [%u]\n", div->child_count);
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
-        putchar('\t');
-        WIDGET_PRINT(tmp);
+        WIDGET_PRINT_N(tmp, depth + 1);
     }
 }
 

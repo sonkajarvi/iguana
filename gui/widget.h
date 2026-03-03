@@ -17,7 +17,8 @@
 #define WIDGET_RELAYOUT(wgt)        ((wgt)->vtable->relayout(wgt))
 #define WIDGET_REPAINT(wgt)         ((wgt)->vtable->repaint(wgt))
 #define WIDGET_FREE(wgt)            ((wgt)->vtable->free(wgt))
-#define WIDGET_PRINT(wgt)           ((wgt)->vtable->print(wgt))
+#define WIDGET_PRINT(wgt)           WIDGET_PRINT_N(wgt, 0)
+#define WIDGET_PRINT_N(wgt, depth)  ((wgt)->vtable->print(wgt, depth))
 
 #define __container_of(ptr, type, member)         \
     ({                                            \
@@ -63,7 +64,7 @@ struct widget_vtable {
     void (*relayout)(struct widget *wgt);
     void (*repaint)(struct widget *wgt);
     void (*free)(struct widget *wgt);
-    void (*print)(struct widget *wgt);
+    void (*print)(struct widget *wgt, int depth);
 };
 
 /*

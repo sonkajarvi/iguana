@@ -42,6 +42,9 @@ static inline void color_to_4f(uint32_t rgba, float out[static 4])
     out[3] = (float)COLOR_A(rgba) / 255.0f;
 }
 
+/* TODO: make this debug only */
+const char *color_to_string(uint32_t rgba);
+
 /*
  * These colors are the same as the CSS named colors.
  * See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/named-color
