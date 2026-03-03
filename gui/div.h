@@ -12,13 +12,17 @@
 
 #include <gui/widget.h>
 
+#define DIV_COLUMN      0
+#define DIV_ROW         1
+
 struct div {
     struct widget widget;
 
     struct widget *child;
     uint32_t child_count;
 
-    /* styling */
+    int direction;
+
     uint32_t background_color;
 };
 

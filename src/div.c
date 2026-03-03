@@ -22,27 +22,39 @@ static void div_relayout(struct widget *wgt)
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp, *end;
     rect_t area;
-    uint32_t x, width;
+    uint32_t start, offset;
 
     if (div->child_count == 0)
         return;
 
     rect_with_margin_padding(wgt, area);
 
-    x = X(area);
-    width = WIDTH(area) / div->child_count;
+    if (div->direction == DIV_COLUMN) {
+        start = X(area);
+        offset = WIDTH(area) / div->child_count;
+    } else {
+        start = Y(area);
+        offset = HEIGHT(area) / div->child_count;
+    }
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
         /* TODO: do this elsewhere, or get it some other way */
         tmp->window = div->widget.window;
 
-        X(tmp->rect) = x;
-        Y(tmp->rect) = Y(area);
-        WIDTH(tmp->rect) = width;
-        HEIGHT(tmp->rect) = HEIGHT(area);
+        if (div->direction == DIV_COLUMN) {
+            X(tmp->rect) = start;
+            Y(tmp->rect) = Y(area);
+            WIDTH(tmp->rect) = offset;
+            HEIGHT(tmp->rect) = HEIGHT(area);
+        } else {
+            X(tmp->rect) = X(area);
+            Y(tmp->rect) = start;
+            WIDTH(tmp->rect) = WIDTH(area);
+            HEIGHT(tmp->rect) = offset;
+        }
 
         WIDGET_RELAYOUT(tmp);
-        x += width;
+        start += offset;
     }
 }
 
@@ -140,6 +152,7 @@ static void div_print(struct widget *wgt, int depth)
     PRINT       ("  color: #%08x %s\n", div->background_color, color ?: "");
     PRINT_VALUES("  margin:", wgt->margin);
     PRINT_VALUES("  padding:", wgt->padding);
+    PRINT       ("  direction: %s\n", div->direction == DIV_ROW ? "row" : "column");
     PRINT       ("  children: [%u]\n", div->child_count);
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
@@ -158,6 +171,7 @@ static const struct div div_default = {
     .widget = {
         .vtable = &div_vtable,
     },
+    .direction = DIV_COLUMN,
     .background_color = COLOR_TRANSPARENT,
 };
 
