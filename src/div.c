@@ -21,24 +21,27 @@ static void div_relayout(struct widget *wgt)
 {
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp, *end;
+    rect_t area;
     uint32_t x, width;
 
     if (div->child_count == 0)
         return;
 
-    x = wgt->x;
-    width = wgt->width / div->child_count;
+    rect_with_margin_padding(wgt, area);
+
+    x = X(area);
+    width = WIDTH(area) / div->child_count;
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
         /* TODO: do this elsewhere, or get it some other way */
         tmp->window = div->widget.window;
 
-        tmp->x = x;
-        tmp->y = wgt->y;
-        tmp->width = width;
-        tmp->height = wgt->height;
-        WIDGET_RELAYOUT(tmp);
+        X(tmp->rect) = x;
+        Y(tmp->rect) = Y(area);
+        WIDTH(tmp->rect) = width;
+        HEIGHT(tmp->rect) = HEIGHT(area);
 
+        WIDGET_RELAYOUT(tmp);
         x += width;
     }
 }
@@ -49,12 +52,15 @@ static void div_repaint(struct widget *wgt)
     struct widget *tmp, *end;
     struct rect rect;
     struct style style;
+    rect_t area;
+
+    rect_with_margin(wgt, area);
 
     memset(&rect, 0, sizeof(rect));
-    rect.position[0] = wgt->x;
-    rect.position[1] = wgt->y;
-    rect.size[0] = wgt->width;
-    rect.size[1] = wgt->height;
+    rect.position[0] = X(area);
+    rect.position[1] = Y(area);
+    rect.size[0] = WIDTH(area);
+    rect.size[1] = HEIGHT(area);
 
     memset(&style, 0, sizeof(style));
     style.style = STYLE_FILL;
@@ -88,9 +94,11 @@ static void div_print(struct widget *wgt)
     struct div *div = __container_of(wgt, struct div, widget);
     struct widget *tmp, *end;
 
-    printf("div name=\"%s\" this=%p parent=%p children=%u color=%08x rect=%u,%u,%u,%u\n",
+    printf("div name=\"%s\" this=%p parent=%p children=%u color=%08x rect=%u,%u,%u,%u margin=%u,%u,%u,%u padding=%u,%u,%u,%u\n",
         wgt->name, div, wgt->parent, div->child_count, div->background_color,
-        wgt->x, wgt->y, wgt->width, wgt->height);
+        X(wgt->rect), Y(wgt->rect), WIDTH(wgt->rect), HEIGHT(wgt->rect),
+        TOP(wgt->margin), RIGHT(wgt->margin), BOTTOM(wgt->margin), LEFT(wgt->margin),
+        TOP(wgt->padding), RIGHT(wgt->padding), BOTTOM(wgt->padding), LEFT(wgt->padding));
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
         putchar('\t');

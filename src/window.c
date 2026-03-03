@@ -76,16 +76,15 @@ int window_exec(struct window *wnd)
         X11_poll_events(wnd);
 
         XGetWindowAttributes(wnd->display, wnd->window, &wa);
-        printf(INFO "%d %d\n", wa.width, wa.height);
 
         if (wnd->should_repaint) {
             GL_painter_begin_frame(&wnd->painter, wnd);
 
             if (wnd->widget) {
-                wnd->widget->width = wa.width;
-                wnd->widget->height = wa.height;
-                WIDGET_RELAYOUT(wnd->widget);
+                WIDTH(wnd->widget->rect) = wa.width;
+                HEIGHT(wnd->widget->rect) = wa.height;
 
+                WIDGET_RELAYOUT(wnd->widget);
                 WIDGET_REPAINT(wnd->widget);
             }
 
