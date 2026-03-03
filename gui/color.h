@@ -187,7 +187,7 @@ static inline void color_to_4f(uint32_t rgba, float out[static 4])
 #define COLOR_TEAL                      0x008080ff
 #define COLOR_THISTLE                   0xd8bfd8ff
 #define COLOR_TOMATO                    0xff6347ff
-#define COLOR_TRANSPARENT               0x000000ff
+#define COLOR_TRANSPARENT               0x00000000
 #define COLOR_TURQUOISE                 0x40e0d0ff
 #define COLOR_VIOLET                    0xee82eeff
 #define COLOR_WHEAT                     0xf5deb3ff
