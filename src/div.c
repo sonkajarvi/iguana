@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025, sonkajarvi
+ * Copyright (c) 2025-2026, sonkajarvi
  *
  * Licensed under the BSD 2-Clause License.
  * The full license can be found in the LICENSE.txt file.
@@ -15,7 +15,7 @@
 #include <gui/widget.h>
 #include <gui/window.h>
 
-#include "internal.h"
+#include "renderer.h"
 
 static void div_relayout(struct widget *wgt)
 {
@@ -75,10 +75,10 @@ static void div_repaint(struct widget *wgt)
     rect.size[1] = HEIGHT(area);
 
     memset(&style, 0, sizeof(style));
-    style.style = STYLE_FILL;
+    style.type = STYLE_FILL;
     style.color = div->background_color;
 
-    GL_painter_draw_rect(&wgt->window->painter, &rect, &style);
+    renderer_draw_rect(wgt->window->renderer, &rect, &style);
 
     if (div->child_count == 0)
         return;

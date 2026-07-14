@@ -19,6 +19,8 @@
 #define COLOR_B(rgba) (((rgba) >>  8) & 255)
 #define COLOR_A(rgba) (((rgba)      ) & 255)
 
+#define COLOR_INT_TO_FLOAT(channel) ((float)(channel) / 255.0f)
+
 /**
  * color_to_3f - Transform RGB color to three floats.
  * @rgb: The color to transform.

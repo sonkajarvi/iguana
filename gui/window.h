@@ -1,110 +1,77 @@
 /**
- * Copyright (c) 2026, sonkajarvi
+ * Copyright (c) 2025-2026, sonkajarvi
  *
  * Licensed under the BSD 2-Clause License.
  * The full license can be found in the LICENSE.txt file.
  */
 
-#ifndef __WINDOW_H
-#define __WINDOW_H
+#ifndef _GUI_GUI_WINDOW_H
+#define _GUI_GUI_WINDOW_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
 #include <X11/X.h>
 
-#include <cglm/types.h>
-#include <glad/gl.h>
 #include <glad/glx.h>
 
 #include <gui/widget.h>
 
-#define INFO    "[info] "
-#define ERROR   "[error] "
+#define INFO    "[INFO] "
+#define ERROR   "[ERROR] "
 
-#define STYLE_FILL 0
-#define STYLE_STROKE 1
-#define STYLE_TEXTURED_FILL 2
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-struct rect {
-    vec2 position;
-    vec2 size;
-    vec4 radius;
-};
+char *read_file(const char *path);
 
-struct style {
-    int style;
-    uint32_t color;
-
-    /* stroke */
-    float st_width;
-
-    /* textured fill */
-    struct texture *tx_texture;
-    vec4 tx_coords;
-};
-
-struct vertex {
-    vec2 position;
-    vec4 color;
-    vec2 center;
-    vec2 size;
-    vec4 radius;
-    vec2 texture_coords;
-    float texture_index;
-    float stroke_width;
-};
-
-struct image {
-    uint8_t *data;
-    int width;
-    int height;
-};
-
-struct texture {
-    int width;
-    int height;
-    int index;
-
-    /* OpenGL */
-    GLuint id;
-};
-
-struct painter {
-    struct vertex *v_buf;       /* also used as a buffer for shader logs */
-    struct vertex *v_ptr;
-
-    struct texture *tex_array[4];
-    int tex_count;
-    struct texture white_texture;
-
-    /* opengl */
-    GLuint program;
-    GLuint vao;
-    GLuint vbo;
-};
-
+/**
+ * struct window - The window structure
+ *
+ * TODO: Separate the X11 and GLX stuff from the generic stuff.
+ */
 struct window {
     struct widget *widget;
-    struct painter painter;
+
+    struct renderer *renderer;
     bool should_close;
-    bool should_repaint;
+    bool should_redraw;
+    float delta_time;
+    int fps;
 
-    /* styling */
-    uint32_t background_color;
-
-    /* x11 */
+    /* X11 */
     Display *display;
     Window root;
     Window window;
     uint64_t time_offset;
 
-    /* glx */
+    /* GLX */
     GLXContext context;
     GLXFBConfig fbconfig;
 };
 
-struct window *window_new(int width, int height, const char *title);
-int window_exec(struct window *wnd);
+int window_exec(struct window *window);
 
-#endif /* !__WINDOW_H */
+int x11_window_create(struct window *window, int width, int height);
+void x11_window_destroy(struct window *window);
+void x11_window_show(struct window *window);
+void x11_window_swap_buffers(struct window *window);
+void x11_window_poll_events(struct window *window);
+
+double x11_window_get_time(struct window *window);
+
+/*
+ * GLX context
+ */
+XVisualInfo *glx_get_visual(struct window *window);
+int glx_create_context(struct window *window);
+void glx_destroy_context(struct window *window);
+
+/*
+ * GL context
+ */
+GLADapiproc gl_get_proc_address(const char *name);
+int gl_load_functions(void);
+int gl_open_handle(void);
+void gl_close_handle(void);
+
+#endif /* !_GUI_GUI_WINDOW_H */
