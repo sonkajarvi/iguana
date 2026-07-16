@@ -12,9 +12,9 @@
 
 #include <glad/gl.h>
 
-#include <gui/color.h>
-#include <gui/image.h>
-#include <gui/window.h>
+#include <iguana/color.h>
+#include <iguana/image.h>
+#include <iguana/window.h>
 
 #include "../renderer.h"
 #include "gl_renderer.h"
@@ -35,7 +35,7 @@ static void gl_renderer_destroy(struct renderer *renderer)
 }
 
 static void gl_renderer_new_frame(struct renderer *renderer,
-                                  struct window *window)
+                                  struct igu_window *window)
 {
     struct gl_renderer *gl_renderer = renderer_priv(renderer);
     XWindowAttributes wa;
@@ -47,9 +47,9 @@ static void gl_renderer_new_frame(struct renderer *renderer,
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(COLOR_INT_TO_FLOAT(COLOR_R(renderer->clear_color)),
-                 COLOR_INT_TO_FLOAT(COLOR_G(renderer->clear_color)),
-                 COLOR_INT_TO_FLOAT(COLOR_B(renderer->clear_color)),
+    glClearColor(IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_R(renderer->clear_color)),
+                 IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_G(renderer->clear_color)),
+                 IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_B(renderer->clear_color)),
                  1.0f);
 
     glUseProgram(gl_renderer->program);
@@ -196,7 +196,7 @@ static bool gl_initialize_shader(struct gl_renderer *gl_renderer,
     /*
      * Vertex shader
      */
-    vert_src = read_file(vert_path);
+    vert_src = igu_read_file(vert_path);
     if (!vert_src) {
         printf(ERROR "GL RENDERER: failed to read file: %s\n", vert_path);
         success = false;
@@ -221,7 +221,7 @@ static bool gl_initialize_shader(struct gl_renderer *gl_renderer,
     /*
      * Fragment shader
      */
-    frag_src = read_file(frag_path);
+    frag_src = igu_read_file(frag_path);
     if (!frag_path) {
         printf(ERROR "GL RENDERER: failed to read file: %s\n", frag_path);
         success = false;
@@ -280,7 +280,7 @@ struct renderer *gl_renderer_create(void)
 {
     struct gl_renderer *gl_renderer;
     struct renderer *renderer;
-    struct image image;
+    struct igu_image image;
     int ret;
 
     renderer = renderer_alloc(sizeof(*gl_renderer));

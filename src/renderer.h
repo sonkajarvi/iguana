@@ -5,8 +5,8 @@
  * The full license can be found in the LICENSE.txt file.
  */
 
-#ifndef _RENDERER_H
-#define _RENDERER_H
+#ifndef _SRC_RENDERER_H
+#define _SRC_RENDERER_H
 
 #include <stddef.h>
 
@@ -15,8 +15,8 @@
 #include <cglm/vec4.h>
 #include <glad/gl.h>
 
-#include <gui/image.h>
-#include <gui/window.h>
+#include <iguana/image.h>
+#include <iguana/window.h>
 
 /**
  * struct vertex - Vertex structure
@@ -52,7 +52,7 @@ struct texture {
     unsigned int width, height;
 };
 
-struct texture *gl_texture_create(struct image *image);
+struct texture *gl_texture_create(struct igu_image *image);
 void gl_texture_destroy(struct texture *texture);
 
 #define RECT_INIT_DEFAULT               \
@@ -109,7 +109,7 @@ struct renderer {
     unsigned int clear_color;
 
     void (*destroy)(struct renderer *renderer);
-    void (*new_frame)(struct renderer *renderer, struct window *window);
+    void (*new_frame)(struct renderer *renderer, struct igu_window *window);
     void (*push_vertices)(struct renderer *renderer,
                           struct vertex *vertices, size_t count);
     void (*flush_vertices)(struct renderer *renderer);
@@ -123,7 +123,7 @@ struct renderer *renderer_alloc(size_t size);
 void renderer_destroy(struct renderer *renderer);
 
 static inline void renderer_new_frame(struct renderer *renderer,
-                                     struct window *window)
+                                      struct igu_window *window)
 {
     if (renderer)
         renderer->new_frame(renderer, window);
@@ -154,4 +154,4 @@ static inline struct texture *renderer_use_texture(struct renderer *renderer,
 void renderer_draw_rect(struct renderer *renderer,
                         struct rect *rect, struct style *style);
 
-#endif /* !_RENDERER_H */
+#endif /* !_SRC_RENDERER_H */

@@ -5,11 +5,11 @@
  * The full license can be found in the LICENSE.txt file.
  */
 
-#include <gui/window.h>
+#include <iguana/window.h>
 
 #include "renderer.h"
 
-int window_exec(struct window *window)
+int igu_window_exec(struct igu_window *window)
 {
     XWindowAttributes wa;
 
@@ -27,8 +27,8 @@ int window_exec(struct window *window)
             renderer_new_frame(window->renderer, window);
 
             if (window->widget) {
-                WIDTH(window->widget->rect) = wa.width;
-                HEIGHT(window->widget->rect) = wa.height;
+                IGU_WIDTH(window->widget->rect) = wa.width;
+                IGU_HEIGHT(window->widget->rect) = wa.height;
 
                 WIDGET_RELAYOUT(window->widget);
                 WIDGET_REPAINT(window->widget);

@@ -12,7 +12,7 @@
 
 #include <X11/Xlib.h>
 
-#include <gui/window.h>
+#include <iguana/window.h>
 
 static Atom wm_delete_window;
 
@@ -26,7 +26,7 @@ static uint64_t get_time(void)
 }
 
 /* time is in seconds */
-double x11_window_get_time(struct window *window)
+double x11_window_get_time(struct igu_window *window)
 {
     if (window)
         return (double)(get_time() - window->time_offset) / 1000000000.0;
@@ -34,7 +34,7 @@ double x11_window_get_time(struct window *window)
         return 0.0;
 }
 
-static int __x11_window_create(struct window *window, int width, int height)
+static int __x11_window_create(struct igu_window *window, int width, int height)
 {
     XVisualInfo *vi;
     XSetWindowAttributes swa;
@@ -92,7 +92,7 @@ static int __x11_window_create(struct window *window, int width, int height)
     return 0;
 }
 
-int x11_window_create(struct window *window, int width, int height)
+int x11_window_create(struct igu_window *window, int width, int height)
 {
     if (!window)
         return -1;
@@ -115,7 +115,7 @@ int x11_window_create(struct window *window, int width, int height)
     return 0;
 }
 
-void x11_window_destroy(struct window *window)
+void x11_window_destroy(struct igu_window *window)
 {
     if (!window)
         return;
@@ -130,7 +130,7 @@ void x11_window_destroy(struct window *window)
     printf(INFO "X11 WINDOW: window destroyed\n");
 }
 
-void x11_window_show(struct window *window)
+void x11_window_show(struct igu_window *window)
 {
     if (!window)
         return;
@@ -140,7 +140,7 @@ void x11_window_show(struct window *window)
     window->should_redraw = true;
 }
 
-static void __x11_window_poll_events(struct window *window)
+static void __x11_window_poll_events(struct igu_window *window)
 {
     XEvent event;
 
@@ -163,7 +163,7 @@ static void __x11_window_poll_events(struct window *window)
     XFlush(window->display);
 }
 
-void x11_window_poll_events(struct window *window)
+void x11_window_poll_events(struct igu_window *window)
 {
     static double last = 0.0;
 
@@ -177,7 +177,7 @@ void x11_window_poll_events(struct window *window)
     __x11_window_poll_events(window);
 }
 
-void x11_window_swap_buffers(struct window *window)
+void x11_window_swap_buffers(struct igu_window *window)
 {
     if (window)
         glXSwapBuffers(window->display, window->window);

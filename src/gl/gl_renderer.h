@@ -5,8 +5,8 @@
  * The full license can be found in the LICENSE.txt file.
  */
 
-#ifndef _GL_RENDERER_H
-#define _GL_RENDERER_H
+#ifndef _SRC_GL_GL_RENDERER_H
+#define _SRC_GL_GL_RENDERER_H
 
 #include <glad/gl.h>
 
@@ -32,4 +32,4 @@ struct gl_renderer {
 
 struct renderer *gl_renderer_create(void);
 
-#endif /* !_GL_RENDERER_H */
+#endif /* !_SRC_GL_GL_RENDERER_H */

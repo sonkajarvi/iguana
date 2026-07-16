@@ -7,9 +7,9 @@
 
 #include <stddef.h>
 
-#include <gui/color.h>
+#include <iguana/color.h>
 
-const char *color_to_string(uint32_t rgba)
+const char *igu_color_to_string(uint32_t rgba)
 {
     switch (rgba) {
     default: return NULL;

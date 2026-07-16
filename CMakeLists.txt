@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(gui LANGUAGES C)
+project(iguana LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_library(gui
+add_library(iguana
     "src/color.c"
     "src/div.c"
     "src/image.c"
@@ -29,24 +29,24 @@ add_library(gui
     "third_party/glad/src/glx.c"
 )
 
-target_include_directories(gui PRIVATE
-    "."
-    "third_party"
-    "third_party/cglm/include"
-    "third_party/glad/include"
+target_include_directories(iguana PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/cglm/include/"
+    "${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include/"
 )
 
-target_link_libraries(gui PRIVATE
+target_link_libraries(iguana PRIVATE
     "X11"
 )
 
-target_compile_options(gui PRIVATE
+target_compile_options(iguana PRIVATE
     "-Wall"
     "-Werror"
     "-Wextra"
     "-Wstrict-prototypes"
 )
 
-target_compile_definitions(gui PRIVATE
+target_compile_definitions(iguana PRIVATE
     "PROJECT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\""
 )

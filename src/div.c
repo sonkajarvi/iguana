@@ -10,47 +10,47 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <gui/color.h>
-#include <gui/div.h>
-#include <gui/widget.h>
-#include <gui/window.h>
+#include <iguana/color.h>
+#include <iguana/div.h>
+#include <iguana/widget.h>
+#include <iguana/window.h>
 
 #include "renderer.h"
 
-static void div_relayout(struct widget *wgt)
+static void div_relayout(struct igu_widget *wgt)
 {
-    struct div *div = __container_of(wgt, struct div, widget);
-    struct widget *tmp, *end;
-    rect_t area;
+    struct igu_div *div = igu_container_of(wgt, struct igu_div, widget);
+    struct igu_widget *tmp, *end;
+    igu_rect_t area;
     uint32_t start, offset;
 
     if (div->child_count == 0)
         return;
 
-    rect_with_margin_padding(wgt, area);
+    igu_rect_with_margin_padding(wgt, area);
 
-    if (div->direction == DIV_COLUMN) {
-        start = X(area);
-        offset = WIDTH(area) / div->child_count;
+    if (div->direction == IGU_DIV_COLUMN) {
+        start = IGU_X(area);
+        offset = IGU_WIDTH(area) / div->child_count;
     } else {
-        start = Y(area);
-        offset = HEIGHT(area) / div->child_count;
+        start = IGU_Y(area);
+        offset = IGU_HEIGHT(area) / div->child_count;
     }
 
     for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
         /* TODO: do this elsewhere, or get it some other way */
         tmp->window = div->widget.window;
 
-        if (div->direction == DIV_COLUMN) {
-            X(tmp->rect) = start;
-            Y(tmp->rect) = Y(area);
-            WIDTH(tmp->rect) = offset;
-            HEIGHT(tmp->rect) = HEIGHT(area);
+        if (div->direction == IGU_DIV_COLUMN) {
+            IGU_X(tmp->rect) = start;
+            IGU_Y(tmp->rect) = IGU_Y(area);
+            IGU_WIDTH(tmp->rect) = offset;
+            IGU_HEIGHT(tmp->rect) = IGU_HEIGHT(area);
         } else {
-            X(tmp->rect) = X(area);
-            Y(tmp->rect) = start;
-            WIDTH(tmp->rect) = WIDTH(area);
-            HEIGHT(tmp->rect) = offset;
+            IGU_X(tmp->rect) = IGU_X(area);
+            IGU_Y(tmp->rect) = start;
+            IGU_WIDTH(tmp->rect) = IGU_WIDTH(area);
+            IGU_HEIGHT(tmp->rect) = offset;
         }
 
         WIDGET_RELAYOUT(tmp);
@@ -58,21 +58,21 @@ static void div_relayout(struct widget *wgt)
     }
 }
 
-static void div_repaint(struct widget *wgt)
+static void div_repaint(struct igu_widget *wgt)
 {
-    struct div *div = __container_of(wgt, struct div, widget);
-    struct widget *tmp, *end;
+    struct igu_div *div = igu_container_of(wgt, struct igu_div, widget);
+    struct igu_widget *tmp, *end;
     struct rect rect;
     struct style style;
-    rect_t area;
+    igu_rect_t area;
 
-    rect_with_margin(wgt, area);
+    igu_rect_with_margin(wgt, area);
 
     memset(&rect, 0, sizeof(rect));
-    rect.position[0] = X(area);
-    rect.position[1] = Y(area);
-    rect.size[0] = WIDTH(area);
-    rect.size[1] = HEIGHT(area);
+    rect.position[0] = IGU_X(area);
+    rect.position[1] = IGU_Y(area);
+    rect.size[0] = IGU_WIDTH(area);
+    rect.size[1] = IGU_HEIGHT(area);
 
     memset(&style, 0, sizeof(style));
     style.type = STYLE_FILL;
@@ -88,13 +88,13 @@ static void div_repaint(struct widget *wgt)
     }
 }
 
-static void div_free(struct widget *wgt)
+static void div_free(struct igu_widget *wgt)
 {
-    struct div *div = __container_of(wgt, struct div, widget);
-    struct widget *tmp;
+    struct igu_div *div = igu_container_of(wgt, struct igu_div, widget);
+    struct igu_widget *tmp;
 
     for (tmp = div->child; tmp; tmp = div->child) {
-        div_del_child(div, tmp);
+        igu_div_del_child(div, tmp);
         WIDGET_FREE(tmp);
     }
 
@@ -113,71 +113,74 @@ static void div_free(struct widget *wgt)
         printf(fmt, ##__VA_ARGS__);         \
     } while (0)
 
-#define PRINT_VALUE(value_)                                                   \
-    do {                                                                      \
-        printf("%u", (value_).value);                                         \
-        if ((value_).value)                                                   \
-            printf("%s", (value_).type == VALUE_TYPE_ABSOLUTE ? "px" : "%"); \
+#define PRINT_VALUE(value_)                                                      \
+    do {                                                                         \
+        printf("%u", (value_).value);                                            \
+        if ((value_).value)                                                      \
+            printf("%s", (value_).type == IGU_VALUE_TYPE_ABSOLUTE ? "px" : "%"); \
     } while (0)
 
-#define PRINT_VALUES(fmt, values)                  \
-    do {                                           \
-        INDENT();                                  \
-        printf(fmt);                               \
-        putchar(' '); PRINT_VALUE(TOP(values));    \
-        putchar(' '); PRINT_VALUE(RIGHT(values));  \
-        putchar(' '); PRINT_VALUE(BOTTOM(values)); \
-        putchar(' '); PRINT_VALUE(LEFT(values));   \
-        putchar('\n');                             \
+#define PRINT_VALUES(fmt, values)                       \
+    do {                                                \
+        INDENT();                                       \
+        printf(fmt);                                    \
+        putchar(' '); PRINT_VALUE(IGU_TOP(values));     \
+        putchar(' '); PRINT_VALUE(IGU_RIGHT(values));   \
+        putchar(' '); PRINT_VALUE(IGU_BOTTOM(values));  \
+        putchar(' '); PRINT_VALUE(IGU_LEFT(values));    \
+        putchar('\n');                                  \
     } while (0)
 
-static void div_print(struct widget *wgt, int depth)
+static void div_print(struct igu_widget *wgt, int depth)
 {
-    struct div *div = __container_of(wgt, struct div, widget);
-    struct widget *tmp, *end;
+    struct igu_div *div = igu_container_of(wgt, struct igu_div, widget);
+    struct igu_widget *tmp, *end;
     const char *color;
-    rect_t m_rect, mp_rect;
+    igu_rect_t m_rect, mp_rect;
 
-    rect_with_margin(wgt, m_rect);
-    rect_with_margin_padding(wgt, mp_rect);
-    color = color_to_string(div->background_color);
+    igu_rect_with_margin(wgt, m_rect);
+    igu_rect_with_margin_padding(wgt, mp_rect);
+    color = igu_color_to_string(div->background_color);
 
     PRINT       ("div\n");
     PRINT       ("  this: %p\n", div);
     PRINT       ("  parent: %p\n", wgt->parent);
-    PRINT       ("  area: %u %u %u %u\n", X(wgt->rect), Y(wgt->rect), WIDTH(wgt->rect), HEIGHT(wgt->rect));
-    PRINT       ("        %u %u %u %u\n", X(m_rect), Y(m_rect), WIDTH(m_rect), HEIGHT(m_rect));
-    PRINT       ("        %u %u %u %u\n", X(mp_rect), Y(mp_rect), WIDTH(mp_rect), HEIGHT(mp_rect));
+    PRINT       ("  area: %u %u %u %u\n", IGU_X(wgt->rect), IGU_Y(wgt->rect),
+                 IGU_WIDTH(wgt->rect), IGU_HEIGHT(wgt->rect));
+    PRINT       ("        %u %u %u %u\n", IGU_X(m_rect), IGU_Y(m_rect),
+                 IGU_WIDTH(m_rect), IGU_HEIGHT(m_rect));
+    PRINT       ("        %u %u %u %u\n", IGU_X(mp_rect), IGU_Y(mp_rect),
+                 IGU_WIDTH(mp_rect), IGU_HEIGHT(mp_rect));
     PRINT       ("  name: %s\n", wgt->name);
     PRINT       ("  color: #%08x %s\n", div->background_color, color ?: "");
     PRINT_VALUES("  margin:", wgt->margin);
     PRINT_VALUES("  padding:", wgt->padding);
-    PRINT       ("  direction: %s\n", div->direction == DIV_ROW ? "row" : "column");
+    PRINT       ("  direction: %s\n", div->direction == IGU_DIV_ROW ? "row" :
+                 "column");
     PRINT       ("  children: [%u]\n", div->child_count);
 
-    for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next) {
+    for (tmp = div->child, end = tmp; tmp && tmp->next != end; tmp = tmp->next)
         WIDGET_PRINT_N(tmp, depth + 1);
-    }
 }
 
-static const struct widget_vtable div_vtable = {
+static const struct igu_widget_vtable div_vtable = {
     .relayout = div_relayout,
     .repaint = div_repaint,
     .free = div_free,
     .print = div_print,
 };
 
-static const struct div div_default = {
+static const struct igu_div div_default = {
     .widget = {
         .vtable = &div_vtable,
     },
-    .direction = DIV_COLUMN,
-    .background_color = COLOR_TRANSPARENT,
+    .direction = IGU_DIV_COLUMN,
+    .background_color = IGU_TRANSPARENT,
 };
 
-struct div *div_new(void)
+struct igu_div *igu_div_new(void)
 {
-    struct div *div = malloc(sizeof(*div));
+    struct igu_div *div = malloc(sizeof(*div));
     if (!div)
         return NULL;
 
@@ -185,9 +188,9 @@ struct div *div_new(void)
     return div;
 }
 
-void div_add_child(struct div *div, struct widget *wgt)
+void igu_div_add_child(struct igu_div *div, struct igu_widget *wgt)
 {
-    struct widget *tmp = div->child, *end = tmp;
+    struct igu_widget *tmp = div->child, *end = tmp;
 
     if (!tmp) {
         div->child = wgt;
@@ -204,7 +207,7 @@ void div_add_child(struct div *div, struct widget *wgt)
     div->child_count++;
 }
 
-void div_del_child(struct div *div, struct widget *wgt)
+void igu_div_del_child(struct igu_div *div, struct igu_widget *wgt)
 {
     if (div->child == wgt)
         div->child = wgt->next;

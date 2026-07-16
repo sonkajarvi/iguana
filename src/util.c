@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <gui/window.h>
+#include <iguana/window.h>
 
-char *read_file(const char *path)
+char *igu_read_file(const char *path)
 {
     FILE *file = fopen(path, "r");
     char *s = NULL;

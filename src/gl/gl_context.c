@@ -10,7 +10,7 @@
 
 #include <glad/gl.h>
 
-#include <gui/window.h>
+#include <iguana/window.h>
 
 static void *handle = NULL;
 

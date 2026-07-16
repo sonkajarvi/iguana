@@ -10,11 +10,11 @@
 
 #include <glad/gl.h>
 
-#include <gui/image.h>
+#include <iguana/image.h>
 
 #include "../renderer.h"
 
-struct texture *gl_texture_create(struct image *image)
+struct texture *gl_texture_create(struct igu_image *image)
 {
     struct texture *texture;
 

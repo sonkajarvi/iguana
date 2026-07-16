@@ -15,12 +15,12 @@
 #define STBI_ONLY_PNG
 #include <stb/stb_image.h>
 
-#include <gui/image.h>
-#include <gui/window.h>
+#include <iguana/image.h>
+#include <iguana/window.h>
 
-struct image *image_load_from_file(const char *path)
+struct igu_image *igu_image_load_from_file(const char *path)
 {
-    struct image *image;
+    struct igu_image *image;
     int comp;
 
     image = malloc(sizeof(*image));
@@ -45,7 +45,7 @@ err:
     return NULL;
 }
 
-void image_free(struct image *image)
+void igu_image_free(struct igu_image *image)
 {
     if (!image)
         return;

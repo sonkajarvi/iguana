@@ -13,8 +13,8 @@
 #include <cglm/vec2.h>
 #include <cglm/vec4.h>
 
-#include <gui/color.h>
-#include <gui/window.h>
+#include <iguana/color.h>
+#include <iguana/window.h>
 
 #include "renderer.h"
 
@@ -54,10 +54,10 @@ void renderer_destroy(struct renderer *renderer)
 
 #define COLOR_TO_VEC4(c)                \
     (vec4){                             \
-        (float)COLOR_R(c) / 255.0f,     \
-        (float)COLOR_G(c) / 255.0f,     \
-        (float)COLOR_B(c) / 255.0f,     \
-        (float)COLOR_A(c) / 255.0f      \
+        (float)IGU_COLOR_R(c) / 255.0f,     \
+        (float)IGU_COLOR_G(c) / 255.0f,     \
+        (float)IGU_COLOR_B(c) / 255.0f,     \
+        (float)IGU_COLOR_A(c) / 255.0f      \
     }
 
 #define COPY_REST_OF_FIELDS(i)                      \
@@ -81,7 +81,7 @@ void renderer_draw_rect(struct renderer *renderer, struct rect *rect,
     if (!renderer || !rect || !style)
         return;
 
-    if (COLOR_A(style->color) == 0)
+    if (IGU_COLOR_A(style->color) == 0)
         return;
 
     if (style->type == STYLE_STROKE && style->stroke_width == 0.0f)

@@ -12,9 +12,9 @@
 #include <glad/gl.h>
 #include <glad/glx.h>
 
-#include <gui/window.h>
+#include <iguana/window.h>
 
-static int glx_load_functions(struct window *window, int screen)
+static int glx_load_functions(struct igu_window *window, int screen)
 {
     int version;
 
@@ -45,7 +45,7 @@ static const int fbconfig_attribs[] = {
     None
 };
 
-static int glx_choose_fbconfig(struct window *window, int screen,
+static int glx_choose_fbconfig(struct igu_window *window, int screen,
                                GLXFBConfig *fbc)
 {
     GLXFBConfig *configs;
@@ -93,7 +93,7 @@ static const int context_attribs[] = {
     None
 };
 
-int glx_create_context(struct window *window)
+int glx_create_context(struct igu_window *window)
 {
     window->context = glXCreateContextAttribsARB(window->display,
                                                  window->fbconfig, NULL, True,
@@ -111,7 +111,7 @@ err:
     return -1;
 }
 
-void glx_destroy_context(struct window *window)
+void glx_destroy_context(struct igu_window *window)
 {
     glXMakeCurrent(window->display, None, NULL);
     glXDestroyContext(window->display, window->context);
@@ -119,7 +119,7 @@ void glx_destroy_context(struct window *window)
     printf(INFO "GLX: context destroyed\n");
 }
 
-XVisualInfo *glx_get_visual(struct window *window)
+XVisualInfo *glx_get_visual(struct igu_window *window)
 {
     int screen;
 
