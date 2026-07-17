@@ -13,31 +13,32 @@
 #include <iguana/accessor.h>
 
 /*
- * @IGU_VALUE_TYPE_RELATIVE - Relative to width/height.
- * @IGU_VALUE_TYPE_ABSOLUTE - Screen pixels.
+ * @IGU_VALUE_ABSOLUTE - Absolute value in screen pixels
+ * @IGU_VALUE_RELATIVE - Relative to parent width or height
  */
-#define IGU_VALUE_TYPE_ABSOLUTE 0
-#define IGU_VALUE_TYPE_RELATIVE 1
-
-#define IGU_PX(x)                           \
-    ((igu_value_t){                         \
-        .type = IGU_VALUE_TYPE_ABSOLUTE,    \
-        .value = (x),                       \
-    })
-
-#define IGU_PER(x)                          \
-    ((igu_value_t){                         \
-        .type = IGU_VALUE_TYPE_RELATIVE,    \
-        .value = (x),                       \
-    })
+enum {
+    IGU_VALUE_ABSOLUTE = 0,
+    IGU_VALUE_RELATIVE,
+};
 
 typedef struct {
-    uint8_t type;
-    uint32_t value;
+    int type;
+    float value;
 } igu_value_t;
 
-/* TODO: This is 32 bytes, and it can (and should) be optimized down. */
 typedef igu_value_t igu_value4_t[4];
+
+#define IGU_PX(x)                       \
+    ((igu_value_t){                     \
+        .type = IGU_VALUE_ABSOLUTE,     \
+        .value = (x),                   \
+    })
+
+#define IGU_PCT(x)                      \
+    ((igu_value_t){                     \
+        .type = IGU_VALUE_RELATIVE,     \
+        .value = (x),                   \
+    })
 
 /*
  * There are three ways to set a four-component value. Below are two helper
@@ -49,31 +50,41 @@ typedef igu_value_t igu_value4_t[4];
  *      a b c d      -->     a b c d
  */
 
-static inline void igu_value_set_all(igu_value4_t value, igu_value_t all)
+static inline void igu_value_set_one(igu_value4_t value, igu_value_t xyzw)
 {
-    IGU_TOP(value) = all;
-    IGU_RIGHT(value) = all;
-    IGU_BOTTOM(value) = all;
-    IGU_LEFT(value) = all;
+    IGU_X(value) = xyzw;
+    IGU_Y(value) = xyzw;
+    IGU_Z(value) = xyzw;
+    IGU_W(value) = xyzw;
 }
 
-static inline void igu_value_set_axis(igu_value4_t value, igu_value_t vert,
-                                      igu_value_t horiz)
+static inline void igu_value_set_two(igu_value4_t value, igu_value_t xz,
+                                     igu_value_t yw)
 {
-    IGU_TOP(value) = vert;
-    IGU_RIGHT(value) = horiz;
-    IGU_BOTTOM(value) = vert;
-    IGU_LEFT(value) = horiz;
+    IGU_X(value) = xz;
+    IGU_Y(value) = yw;
+    IGU_Z(value) = xz;
+    IGU_W(value) = yw;
 }
 
-static inline uint32_t igu_value(igu_value_t value, uint32_t rel)
+static inline void igu_value_set_four(igu_value4_t value, igu_value_t x,
+                                      igu_value_t y, igu_value_t z,
+                                      igu_value_t w)
+{
+    IGU_X(value) = x;
+    IGU_Y(value) = y;
+    IGU_Z(value) = z;
+    IGU_W(value) = w;
+}
+
+static inline uint32_t igu_value(igu_value_t value, float relative)
 {
     switch (value.type) {
-    case IGU_VALUE_TYPE_ABSOLUTE:
+    case IGU_VALUE_ABSOLUTE:
         return value.value;
 
-    case IGU_VALUE_TYPE_RELATIVE:
-        return rel * value.value / 100;
+    case IGU_VALUE_RELATIVE:
+        return relative * value.value / 100.0f;
 
     default:
         return -1;

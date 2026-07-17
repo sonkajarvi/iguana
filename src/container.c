@@ -126,12 +126,11 @@ static void container_free(struct igu_widget *widget)
         printf(fmt, ##__VA_ARGS__);     \
     } while (0)
 
-#define PRINT_VALUE(value_)                                             \
-    do {                                                                \
-        printf("%u", (value_).value);                                   \
-        if ((value_).value)                                             \
-            printf("%s", (value_).type == IGU_VALUE_TYPE_ABSOLUTE ?     \
-                   "px" : "%");                                         \
+#define PRINT_VALUE(value_)                                                 \
+    do {                                                                    \
+        printf("%f", (value_).value);                                       \
+        if ((value_).value)                                                 \
+            printf("%s", (value_).type == IGU_VALUE_ABSOLUTE ? "px" : "%"); \
     } while (0)
 
 #define PRINT_VALUES(fmt, values)                       \
