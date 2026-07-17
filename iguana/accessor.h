@@ -10,8 +10,11 @@
 
 #define IGU_X(x)            ((x)[0])
 #define IGU_Y(x)            ((x)[1])
-#define IGU_WIDTH(x)        ((x)[2])
-#define IGU_HEIGHT(x)       ((x)[3])
+#define IGU_Z(x)            ((x)[2])
+#define IGU_W(x)            ((x)[3])
+
+#define IGU_WIDTH(x)        IGU_Z(x)
+#define IGU_HEIGHT(x)       IGU_W(x)
 
 #define IGU_TOP(x)          ((x)[0])
 #define IGU_RIGHT(x)        ((x)[1])
