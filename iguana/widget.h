@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include <iguana/accessor.h>
+#include <iguana/rect.h>
 #include <iguana/value.h>
 
 #define WIDGET_RELAYOUT(wgt)        ((wgt)->vtable->relayout(wgt))
@@ -25,8 +26,6 @@
         void *__ptr = (void *)(ptr);              \
         (type *)(__ptr - offsetof(type, member)); \
     })
-
-typedef uint32_t igu_rect_t[4];
 
 /**
  * struct igu_widget - The base widget structure.

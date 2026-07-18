@@ -12,6 +12,7 @@
 
 #include <iguana/color.h>
 #include <iguana/container.h>
+#include <iguana/rect.h>
 #include <iguana/widget.h>
 #include <iguana/window.h>
 
@@ -168,12 +169,12 @@ static void container_print(struct igu_widget *widget, int depth)
     PRINT       ("container:\n");
     PRINT       ("  this: %p\n", container);
     PRINT       ("  parent: %p\n", widget->parent);
-    PRINT       ("  area: %u %u %u %u\n", IGU_X(widget->rect),
+    PRINT       ("  area: %f %f %f %f\n", IGU_X(widget->rect),
                  IGU_Y(widget->rect), IGU_WIDTH(widget->rect),
                  IGU_HEIGHT(widget->rect));
-    PRINT       ("        %u %u %u %u\n", IGU_X(m_rect), IGU_Y(m_rect),
+    PRINT       ("        %f %f %f %f\n", IGU_X(m_rect), IGU_Y(m_rect),
                  IGU_WIDTH(m_rect), IGU_HEIGHT(m_rect));
-    PRINT       ("        %u %u %u %u\n", IGU_X(mp_rect), IGU_Y(mp_rect),
+    PRINT       ("        %f %f %f %f\n", IGU_X(mp_rect), IGU_Y(mp_rect),
                  IGU_WIDTH(mp_rect), IGU_HEIGHT(mp_rect));
     PRINT       ("  name: %s\n", widget->name);
     PRINT       ("  color: #%08x %s\n", container->background_color,
