@@ -31,6 +31,8 @@ struct igu_container {
 
     /* styles */
     uint32_t background_color;
+    uint32_t border_color;
+    float border_width;
     int direction;
 };
 

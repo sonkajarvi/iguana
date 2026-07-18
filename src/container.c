@@ -90,6 +90,14 @@ static void container_repaint(struct igu_widget *widget)
 
     renderer_draw_rect(widget->window->renderer, &rect, &style);
 
+    if (container->border_width > 0.0f) {
+        style.type = STYLE_STROKE;
+        style.color = container->border_color;
+        style.stroke_width = container->border_width;
+
+        renderer_draw_rect(widget->window->renderer, &rect, &style);
+    }
+
     if (container->num_children == 0)
         return;
 
@@ -193,8 +201,10 @@ static const struct igu_container container_default = {
     .widget = {
         .vtable = &container_vtable,
     },
-    .direction = IGU_CONTAINER_HORIZONTAL,
     .background_color = IGU_TRANSPARENT,
+    .border_color = IGU_TRANSPARENT,
+    .border_width = 0.0f,
+    .direction = IGU_CONTAINER_HORIZONTAL,
 };
 
 struct igu_container *igu_container_create(void)
