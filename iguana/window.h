@@ -50,6 +50,7 @@ struct igu_window {
 };
 
 int igu_window_exec(struct igu_window *window);
+struct igu_window *igu_window_create(int width, int height);
 
 int x11_window_create(struct igu_window *window, int width, int height);
 void x11_window_destroy(struct igu_window *window);

@@ -5,8 +5,11 @@
  * The full license can be found in the LICENSE.txt file.
  */
 
+#include <stdlib.h>
+
 #include <iguana/window.h>
 
+#include "gl/gl_renderer.h"
 #include "renderer.h"
 
 int igu_window_exec(struct igu_window *window)
@@ -44,4 +47,28 @@ int igu_window_exec(struct igu_window *window)
     x11_window_destroy(window);
 
     return 0;
+}
+
+struct igu_window *igu_window_create(int width, int height)
+{
+    struct igu_window *window;
+
+    window = malloc(sizeof(*window));
+    if (!window)
+        return NULL;
+
+    if (x11_window_create(window, width, height) != 0)
+        goto err_free;
+
+    window->renderer = gl_renderer_create();
+    if (!window->renderer)
+        goto err_destroy;
+
+    return window;
+
+err_destroy:
+    x11_window_destroy(window);
+err_free:
+    free(window);
+    return NULL;
 }
