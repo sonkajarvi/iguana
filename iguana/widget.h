@@ -66,50 +66,25 @@ struct igu_widget_vtable {
     void (*print)(struct igu_widget *wgt, int depth);
 };
 
-/*
- * igu_rect_with_margin - Calculate an area, with margin applied, for painting
- * the widget.
- * @wgt: The widget to use.
- * @out: The rect to write to.
+/**
+ * igu_widget_rect_with_margin() - Get widget area, with margin
+ * @widget:         The widget to use
+ * @out:            The rect to write to
+ *
+ * Calculate a widget's area, with margin applied, for painting.
  */
-static inline void igu_rect_with_margin(struct igu_widget *wgt, igu_rect_t out)
-{
-    uint32_t left, top;
-
-    left = igu_value(IGU_LEFT(wgt->margin), IGU_WIDTH(wgt->rect));
-    top = igu_value(IGU_TOP(wgt->margin), IGU_HEIGHT(wgt->rect));
-
-    IGU_X(out) = IGU_X(wgt->rect) + left;
-    IGU_Y(out) = IGU_Y(wgt->rect) + top;
-    IGU_WIDTH(out) = IGU_WIDTH(wgt->rect) - left -
-                     igu_value(IGU_RIGHT(wgt->margin), IGU_WIDTH(wgt->rect));
-    IGU_HEIGHT(out) = IGU_HEIGHT(wgt->rect) - top -
-                      igu_value(IGU_BOTTOM(wgt->margin),
-                                IGU_HEIGHT(wgt->rect));
-}
+void igu_widget_rect_with_margin(struct igu_widget *widget, igu_rect_t out);
 
 /**
- * igu_rect_with_margin_padding - Calculate an area, with margin and padding
- * applied, for calculating the areas for the widget's children.
- * @wgt: The widget to use.
- * @out: The rect to write to.
+ * igu_widget_rect_with_margin_and_padding() - Get widget area, with margin and
+ *                                             padding
+ * @widget:         The widget to use
+ * @out:            The rect to write to
+ *
+ * Calculate a widget's area, with margin and padding applied, for calculating
+ * the areas for the widget's children.
  */
-static inline void igu_rect_with_margin_padding(struct igu_widget *wgt,
-                                                igu_rect_t out)
-{
-    uint32_t left, top;
-
-    igu_rect_with_margin(wgt, out);
-
-    left = igu_value(IGU_LEFT(wgt->padding), IGU_WIDTH(wgt->rect));
-    top = igu_value(IGU_TOP(wgt->padding), IGU_HEIGHT(wgt->rect));
-
-    IGU_X(out) += left;
-    IGU_Y(out) += top;
-    IGU_WIDTH(out) -= left + igu_value(IGU_RIGHT(wgt->padding),
-                                       IGU_WIDTH(wgt->rect));
-    IGU_HEIGHT(out) -= top + igu_value(IGU_TOP(wgt->padding),
-                                       IGU_HEIGHT(wgt->rect));
-}
+void igu_widget_rect_with_margin_and_padding(struct igu_widget *widget,
+                                             igu_rect_t out);
 
 #endif /* !_IGUANA_WIDGET_H */

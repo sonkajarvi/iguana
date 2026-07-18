@@ -12,6 +12,7 @@ add_library(iguana
     "src/image.c"
     "src/renderer.c"
     "src/util.c"
+    "src/widget.c"
     "src/window.c"
 
     # gl

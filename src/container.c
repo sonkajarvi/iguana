@@ -35,7 +35,7 @@ static void container_relayout(struct igu_widget *widget)
     if (container->num_children == 0)
         return;
 
-    igu_rect_with_margin_padding(widget, area);
+    igu_widget_rect_with_margin_and_padding(widget, area);
 
     if (container->direction == IGU_CONTAINER_VERTICAL) {
         start = IGU_X(area);
@@ -77,7 +77,7 @@ static void container_repaint(struct igu_widget *widget)
     struct style style;
     igu_rect_t area;
 
-    igu_rect_with_margin(widget, area);
+    igu_widget_rect_with_margin(widget, area);
 
     memset(&rect, 0, sizeof(rect));
     rect.position[0] = IGU_X(area);
@@ -162,8 +162,8 @@ static void container_print(struct igu_widget *widget, int depth)
     const char *color;
     igu_rect_t m_rect, mp_rect;
 
-    igu_rect_with_margin(widget, m_rect);
-    igu_rect_with_margin_padding(widget, mp_rect);
+    igu_widget_rect_with_margin(widget, m_rect);
+    igu_widget_rect_with_margin_and_padding(widget, mp_rect);
     color = igu_color_to_string(container->background_color);
 
     PRINT       ("container:\n");
