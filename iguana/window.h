@@ -38,6 +38,10 @@ struct igu_window {
     float delta_time;
     int fps;
 
+    int x, y;
+    int width, height;
+    int mouse_x, mouse_y;
+
     /* X11 */
     Display *display;
     Window root;

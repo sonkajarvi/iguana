@@ -166,6 +166,10 @@ static void __x11_window_poll_events(struct igu_window *window)
 void x11_window_poll_events(struct igu_window *window)
 {
     static double last = 0.0;
+    XWindowAttributes wa;
+    Window tmp_window;
+    int tmp_int;
+    unsigned int tmp_uint;
 
     if (!window)
         return;
@@ -173,6 +177,16 @@ void x11_window_poll_events(struct igu_window *window)
     double now = x11_window_get_time(window);
     window->delta_time = (float)(now - last);
     last = now;
+
+    XQueryPointer(window->display, window->window, &tmp_window,
+                  &tmp_window, &tmp_int, &tmp_int, &window->mouse_x,
+                  &window->mouse_y, &tmp_uint);
+
+    XGetWindowAttributes(window->display, window->window, &wa);
+    window->x = wa.x;
+    window->y = wa.y;
+    window->width = wa.width;
+    window->height = wa.height;
 
     __x11_window_poll_events(window);
 }
