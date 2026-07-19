@@ -169,13 +169,9 @@ static void container_print(struct igu_widget *widget, int depth)
     PRINT       ("container:\n");
     PRINT       ("  this: %p\n", container);
     PRINT       ("  parent: %p\n", widget->parent);
-    PRINT       ("  area: %f %f %f %f\n", IGU_X(widget->rect),
-                 IGU_Y(widget->rect), IGU_WIDTH(widget->rect),
-                 IGU_HEIGHT(widget->rect));
-    PRINT       ("        %f %f %f %f\n", IGU_X(m_rect), IGU_Y(m_rect),
-                 IGU_WIDTH(m_rect), IGU_HEIGHT(m_rect));
-    PRINT       ("        %f %f %f %f\n", IGU_X(mp_rect), IGU_Y(mp_rect),
-                 IGU_WIDTH(mp_rect), IGU_HEIGHT(mp_rect));
+    PRINT       ("  area: " IGU_RECT_FMT "\n", IGU_RECT_PRINT(widget->rect));
+    PRINT       ("        " IGU_RECT_FMT "\n", IGU_RECT_PRINT(m_rect));
+    PRINT       ("        " IGU_RECT_FMT "\n", IGU_RECT_PRINT(mp_rect));
     PRINT       ("  name: %s\n", widget->name);
     PRINT       ("  color: #%08x %s\n", container->background_color,
                  color ?: "");
