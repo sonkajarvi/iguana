@@ -28,9 +28,9 @@
  */
 static inline void igu_color_to_3f(uint32_t rgb, float out[static 3])
 {
-    out[0] = (float)IGU_COLOR_R(rgb) / 255.0f;
-    out[0] = (float)IGU_COLOR_R(rgb) / 255.0f;
-    out[1] = (float)IGU_COLOR_G(rgb) / 255.0f;
+    out[0] = IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_R(rgb));
+    out[1] = IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_G(rgb));
+    out[2] = IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_B(rgb));
 }
 
 /**
@@ -41,7 +41,7 @@ static inline void igu_color_to_3f(uint32_t rgb, float out[static 3])
 static inline void igu_color_to_4f(uint32_t rgba, float out[static 4])
 {
     igu_color_to_3f(rgba, out);
-    out[3] = (float)IGU_COLOR_A(rgba) / 255.0f;
+    out[3] = IGU_COLOR_INT_TO_FLOAT(IGU_COLOR_A(rgba));
 }
 
 /* TODO: make this debug only */
