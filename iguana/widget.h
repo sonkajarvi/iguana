@@ -15,12 +15,6 @@
 #include <iguana/rect.h>
 #include <iguana/value.h>
 
-#define WIDGET_RELAYOUT(wgt)        ((wgt)->vtable->relayout(wgt))
-#define WIDGET_REPAINT(wgt)         ((wgt)->vtable->repaint(wgt))
-#define WIDGET_FREE(wgt)            ((wgt)->vtable->free(wgt))
-#define WIDGET_PRINT(wgt)           WIDGET_PRINT_N(wgt, 0)
-#define WIDGET_PRINT_N(wgt, depth)  ((wgt)->vtable->print(wgt, depth))
-
 #define igu_container_of(ptr, type, member)       \
     ({                                            \
         void *__ptr = (void *)(ptr);              \
@@ -60,11 +54,36 @@ struct igu_widget {
  *            to the console.
  */
 struct igu_widget_vtable {
-    void (*relayout)(struct igu_widget *wgt);
-    void (*repaint)(struct igu_widget *wgt);
-    void (*free)(struct igu_widget *wgt);
-    void (*print)(struct igu_widget *wgt, int depth);
+    void (*relayout)(struct igu_widget *widget);
+    void (*redraw)(struct igu_widget *widget);
+    void (*free)(struct igu_widget *widget);
+    void (*print)(struct igu_widget *widget, int depth);
 };
+
+static inline void igu_widget_relayout(struct igu_widget *widget)
+{
+    widget->vtable->relayout(widget);
+}
+
+static inline void igu_widget_redraw(struct igu_widget *widget)
+{
+    widget->vtable->redraw(widget);
+}
+
+static inline void igu_widget_free(struct igu_widget *widget)
+{
+    widget->vtable->free(widget);
+}
+
+static inline void __igu_widget_print(struct igu_widget *widget, int depth)
+{
+    widget->vtable->print(widget, depth);
+}
+
+static inline void igu_widget_print(struct igu_widget *widget)
+{
+    __igu_widget_print(widget, 0);
+}
 
 /**
  * igu_widget_rect_with_margin() - Get widget area, with margin

@@ -29,8 +29,8 @@ int igu_window_exec(struct igu_window *window)
                 IGU_WIDTH(window->widget->rect) = window->width;
                 IGU_HEIGHT(window->widget->rect) = window->height;
 
-                WIDGET_RELAYOUT(window->widget);
-                WIDGET_REPAINT(window->widget);
+                igu_widget_relayout(window->widget);
+                igu_widget_redraw(window->widget);
             }
 
             renderer_flush_vertices(window->renderer);

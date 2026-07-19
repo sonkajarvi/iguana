@@ -62,7 +62,7 @@ static void container_relayout(struct igu_widget *widget)
             IGU_HEIGHT(tmp->rect) = offset;
         }
 
-        WIDGET_RELAYOUT(tmp);
+        igu_widget_relayout(tmp);
         start += offset;
     }
 }
@@ -104,7 +104,7 @@ static void container_repaint(struct igu_widget *widget)
 
     for (tmp = container->children, end = tmp;
          tmp && tmp->next != end; tmp = tmp->next) {
-        WIDGET_REPAINT(tmp);
+        igu_widget_redraw(tmp);
     }
 }
 
@@ -117,7 +117,7 @@ static void container_free(struct igu_widget *widget)
 
     for (tmp = container->children; tmp; tmp = container->children) {
         igu_container_del_child(container, tmp);
-        WIDGET_FREE(tmp);
+        igu_widget_free(tmp);
     }
 
     free(container);
@@ -182,12 +182,12 @@ static void container_print(struct igu_widget *widget, int depth)
 
     for (tmp = container->children, end = tmp;
          tmp && tmp->next != end; tmp = tmp->next)
-        WIDGET_PRINT_N(tmp, depth + 1);
+        __igu_widget_print(tmp, depth + 1);
 }
 
 static const struct igu_widget_vtable container_vtable = {
     .relayout = container_relayout,
-    .repaint = container_repaint,
+    .redraw = container_repaint,
     .free = container_free,
     .print = container_print,
 };
