@@ -125,7 +125,7 @@ static void container_free(struct igu_widget *widget)
 
 #define INDENT()                                \
     do {                                        \
-        for (int i = 0; i < depth * 4; i++)     \
+        for (int i = 0; i < depth * 8; i++)     \
             putchar(' ');                       \
     } while (0)
 
@@ -137,7 +137,7 @@ static void container_free(struct igu_widget *widget)
 
 #define PRINT_VALUE(value_)                                                 \
     do {                                                                    \
-        printf("%f", (value_).value);                                       \
+        printf("%.1f", (value_).value);                                     \
         if ((value_).value)                                                 \
             printf("%s", (value_).type == IGU_VALUE_ABSOLUTE ? "px" : "%"); \
     } while (0)
@@ -164,23 +164,21 @@ static void container_print(struct igu_widget *widget, int depth)
 
     igu_widget_rect_with_margin(widget, m_rect);
     igu_widget_rect_with_margin_and_padding(widget, mp_rect);
-    color = igu_color_to_string(container->background_color);
+    color = igu_color_to_string(container->background_color) ?: "";
 
     PRINT       ("container:\n");
-    PRINT       ("  this: %p\n", container);
-    PRINT       ("  parent: %p\n", widget->parent);
-    PRINT       ("  area: " IGU_RECT_FMT "\n", IGU_RECT_PRINT(widget->rect));
-    PRINT       ("        " IGU_RECT_FMT "\n", IGU_RECT_PRINT(m_rect));
-    PRINT       ("        " IGU_RECT_FMT "\n", IGU_RECT_PRINT(mp_rect));
-    PRINT       ("  name: %s\n", widget->name);
-    PRINT       ("  color: #%08x %s\n", container->background_color,
-                 color ?: "");
-    PRINT_VALUES("  margin:", widget->margin);
-    PRINT_VALUES("  padding:", widget->padding);
-    PRINT       ("  direction: %s\n",
-                 container->direction == IGU_CONTAINER_HORIZONTAL ?
-                 "row" : "column");
-    PRINT       ("  children: [%zu]\n", container->num_children);
+    PRINT       ("    this: %p\n", container);
+    PRINT       ("    parent: %p\n", widget->parent);
+    PRINT       ("    area: " IGU_RECT_FMT "\n", IGU_RECT_PRINT(widget->rect));
+    PRINT       ("          " IGU_RECT_FMT "\n", IGU_RECT_PRINT(m_rect));
+    PRINT       ("          " IGU_RECT_FMT "\n", IGU_RECT_PRINT(mp_rect));
+    PRINT       ("    name: %s\n", widget->name);
+    PRINT       ("    color: #%08x %s\n", container->background_color, color);
+    PRINT_VALUES("    margin:", widget->margin);
+    PRINT_VALUES("    padding:", widget->padding);
+    PRINT       ("    direction: %s\n", container->direction ==
+                 IGU_CONTAINER_HORIZONTAL ? "row" : "column");
+    PRINT       ("    children: [%zu]\n", container->num_children);
 
     for (tmp = container->children, end = tmp;
          tmp && tmp->next != end; tmp = tmp->next)
