@@ -153,6 +153,12 @@ static void container_free(struct igu_widget *widget)
         putchar('\n');                                  \
     } while (0)
 
+#define ARGB(x)                 \
+    (IGU_COLOR_A(x) << 24 |     \
+     IGU_COLOR_R(x) << 16 |     \
+     IGU_COLOR_G(x) << 8  |     \
+     IGU_COLOR_B(x))
+
 static void container_print(struct igu_widget *widget, int depth)
 {
     struct igu_container *container = igu_container_of(widget,
@@ -173,7 +179,8 @@ static void container_print(struct igu_widget *widget, int depth)
     PRINT       ("          " IGU_RECT_FMT "\n", IGU_RECT_PRINT(m_rect));
     PRINT       ("          " IGU_RECT_FMT "\n", IGU_RECT_PRINT(mp_rect));
     PRINT       ("    name: %s\n", widget->name);
-    PRINT       ("    color: #%08x %s\n", container->background_color, color);
+    PRINT       ("    color: #%08x %s\n", ARGB(container->background_color),
+                 color);
     PRINT_VALUES("    margin:", widget->margin);
     PRINT_VALUES("    padding:", widget->padding);
     PRINT       ("    direction: %s\n", container->direction ==
