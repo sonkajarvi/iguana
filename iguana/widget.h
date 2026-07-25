@@ -44,7 +44,17 @@ struct igu_widget {
     const char *name;
     igu_rect_t rect;
     igu_value4_t margin, padding;
+
+    /* events */
+    void (*on_mouse_enter)(struct igu_widget *widget);
+    void (*on_mouse_exit)(struct igu_widget *widget);
 };
+
+#define igu_widget_invoke_event(_widget, _event, ...)       \
+    do {                                                    \
+        if ((_widget) && (_widget)->_event)                 \
+            (_widget)->_event((_widget), ##__VA_ARGS__);    \
+    } while (0)
 
 /**
  * struct igu_widget_vtable - Structure for the widget virtual function table.
