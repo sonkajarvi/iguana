@@ -37,6 +37,8 @@ struct igu_widget {
 
     struct igu_window *window;
     struct igu_widget *parent;
+    struct igu_widget *children;
+    size_t num_children;
     struct igu_widget *prev, *next;
 
     const char *name;
