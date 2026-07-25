@@ -42,6 +42,7 @@ struct igu_window {
     int width, height;
     int mouse_x, mouse_x_delta, mouse_x_prev;
     int mouse_y, mouse_y_delta, mouse_y_prev;
+    struct igu_widget *hovered;
 
     /* X11 */
     Display *display;
