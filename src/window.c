@@ -66,6 +66,21 @@ static struct igu_widget *igu_window_hit_test(struct igu_window *window)
     return test_hit_vertical(widget, window->mouse_x, window->mouse_y);
 }
 
+static void igu_window_compute_hovered_widget(struct igu_window *window)
+{
+    struct igu_widget *hit;
+
+    if (window->mouse_x_delta == 0 && window->mouse_y_delta == 0)
+        return;
+
+    hit = igu_window_hit_test(window);
+    if (hit != window->hovered) {
+        igu_widget_invoke_event(hit, on_mouse_enter);
+        igu_widget_invoke_event(window->hovered, on_mouse_exit);
+    }
+    window->hovered = hit;
+}
+
 int igu_window_exec(struct igu_window *window)
 {
     x11_window_show(window);
@@ -93,8 +108,7 @@ int igu_window_exec(struct igu_window *window)
             x11_window_swap_buffers(window);
         }
 
-        if (window->mouse_x_delta || window->mouse_y_delta)
-            window->hovered = igu_window_hit_test(window);
+        igu_window_compute_hovered_widget(window);
     }
 
     x11_window_destroy(window);
