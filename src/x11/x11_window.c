@@ -178,9 +178,15 @@ void x11_window_poll_events(struct igu_window *window)
     window->delta_time = (float)(now - last);
     last = now;
 
+    window->mouse_x_prev = window->mouse_x;
+    window->mouse_y_prev = window->mouse_y;
+
     XQueryPointer(window->display, window->window, &tmp_window,
                   &tmp_window, &tmp_int, &tmp_int, &window->mouse_x,
                   &window->mouse_y, &tmp_uint);
+
+    window->mouse_x_delta = window->mouse_x - window->mouse_x_prev;
+    window->mouse_y_delta = window->mouse_y - window->mouse_y_prev;
 
     XGetWindowAttributes(window->display, window->window, &wa);
     window->x = wa.x;
