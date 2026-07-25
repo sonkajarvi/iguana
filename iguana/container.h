@@ -25,10 +25,6 @@ enum {
 struct igu_container {
     struct igu_widget widget;
 
-    /* properties */
-    struct igu_widget *children;
-    size_t num_children;
-
     /* styles */
     uint32_t background_color;
     uint32_t border_color;

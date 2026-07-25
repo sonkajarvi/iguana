@@ -32,20 +32,20 @@ static void container_relayout(struct igu_widget *widget)
     igu_rect_t area;
     uint32_t start, offset;
 
-    if (container->num_children == 0)
+    if (container->widget.num_children == 0)
         return;
 
     igu_widget_rect_with_margin_and_padding(widget, area);
 
     if (container->direction == IGU_CONTAINER_VERTICAL) {
         start = IGU_X(area);
-        offset = IGU_WIDTH(area) / container->num_children;
+        offset = IGU_WIDTH(area) / container->widget.num_children;
     } else {
         start = IGU_Y(area);
-        offset = IGU_HEIGHT(area) / container->num_children;
+        offset = IGU_HEIGHT(area) / container->widget.num_children;
     }
 
-    for (tmp = container->children, end = tmp;
+    for (tmp = container->widget.children, end = tmp;
          tmp && tmp->next != end; tmp = tmp->next) {
         /* TODO: do this elsewhere, or get it some other way */
         tmp->window = container->widget.window;
@@ -99,10 +99,10 @@ static void container_repaint(struct igu_widget *widget)
         renderer_draw_rect(widget->window->renderer, &rect, &style);
     }
 
-    if (container->num_children == 0)
+    if (container->widget.num_children == 0)
         return;
 
-    for (tmp = container->children, end = tmp;
+    for (tmp = container->widget.children, end = tmp;
          tmp && tmp->next != end; tmp = tmp->next) {
         igu_widget_redraw(tmp);
     }
@@ -113,11 +113,13 @@ static void container_free(struct igu_widget *widget)
     struct igu_container *container = igu_container_of(widget,
                                                        struct igu_container,
                                                        widget);
-    struct igu_widget *tmp;
+    struct igu_widget *tmp = container->widget.children;
 
-    for (tmp = container->children; tmp; tmp = container->children) {
+    while (tmp) {
         igu_container_del_child(container, tmp);
         igu_widget_free(tmp);
+
+        tmp = container->widget.children;
     }
 
     free(container);
@@ -185,9 +187,9 @@ static void container_print(struct igu_widget *widget, int depth)
     PRINT_VALUES("    padding:", widget->padding);
     PRINT       ("    direction: %s\n", container->direction ==
                  IGU_CONTAINER_HORIZONTAL ? "row" : "column");
-    PRINT       ("    children: [%zu]\n", container->num_children);
+    PRINT       ("    children: [%zu]\n", widget->num_children);
 
-    for (tmp = container->children, end = tmp;
+    for (tmp = widget->children, end = tmp;
          tmp && tmp->next != end; tmp = tmp->next)
         __igu_widget_print(tmp, depth + 1);
 }
@@ -222,10 +224,10 @@ struct igu_container *igu_container_create(void)
 void igu_container_add_child(struct igu_container *container,
                              struct igu_widget *widget)
 {
-    struct igu_widget *tmp = container->children, *end = tmp;
+    struct igu_widget *tmp = container->widget.children, *end = tmp;
 
     if (!tmp) {
-        container->children = widget;
+        container->widget.children = widget;
     } else {
         while (tmp && tmp != end)
             tmp = tmp->next;
@@ -236,14 +238,14 @@ void igu_container_add_child(struct igu_container *container,
     }
 
     widget->parent = &container->widget;
-    container->num_children++;
+    container->widget.num_children++;
 }
 
 void igu_container_del_child(struct igu_container *container,
                              struct igu_widget *widget)
 {
-    if (container->children == widget)
-        container->children = widget->next;
+    if (container->widget.children == widget)
+        container->widget.children = widget->next;
 
     if (widget->prev)
         widget->prev->next = widget->next;
@@ -253,5 +255,5 @@ void igu_container_del_child(struct igu_container *container,
     widget->prev = NULL;
     widget->next = NULL;
     widget->parent = NULL;
-    container->num_children--;
+    container->widget.num_children--;
 }
