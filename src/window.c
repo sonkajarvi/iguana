@@ -5,11 +5,14 @@
  * The full license can be found in the LICENSE.txt file.
  */
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <iguana/event.h>
 #include <iguana/rect.h>
 #include <iguana/widget.h>
 #include <iguana/window.h>
@@ -81,6 +84,54 @@ static void igu_window_compute_hovered_widget(struct igu_window *window)
     window->hovered = hit;
 }
 
+static void igu_window_handle_events(struct igu_window *window)
+{
+    struct igu_event event;
+    int ret;
+
+    ret = igu_event_queue_pop(&window->event_queue, &event);
+    if (ret == -ENOENT)
+        return;
+    if (ret < 0) {
+        printf(ERROR "WINDOW: failed to pop event from the queue\n");
+        return;
+    }
+
+    switch (event.type) {
+    case IGU_EVENT_TYPE_MOUSE:
+        break;
+
+    case IGU_EVENT_TYPE_MOUSE_MOVE:
+        window->mouse_x_prev = window->mouse_x;
+        window->mouse_y_prev = window->mouse_y;
+
+        window->mouse_x = event.mouse_move.x;
+        window->mouse_y = event.mouse_move.y;
+
+        window->mouse_x_delta = window->mouse_x - window->mouse_x_prev;
+        window->mouse_y_delta = window->mouse_y - window->mouse_y_prev;
+        break;
+
+    case IGU_EVENT_TYPE_MOUSE_SCROLL:
+        break;
+
+    case IGU_EVENT_TYPE_WINDOW_MOVE:
+        window->x = event.window_move.x;
+        window->y = event.window_move.y;
+        break;
+
+    case IGU_EVENT_TYPE_WINDOW_RESIZE:
+        window->width = event.window_resize.width;
+        window->height = event.window_resize.height;
+
+        window->should_redraw = true;
+        break;
+
+    default:
+        break;
+    }
+}
+
 int igu_window_exec(struct igu_window *window)
 {
     x11_window_show(window);
@@ -103,12 +154,14 @@ int igu_window_exec(struct igu_window *window)
             }
 
             renderer_flush_vertices(window->renderer);
-            // window->should_redraw = false;
+            window->should_redraw = false;
 
             x11_window_swap_buffers(window);
         }
 
         igu_window_compute_hovered_widget(window);
+
+        igu_window_handle_events(window);
     }
 
     x11_window_destroy(window);
@@ -124,17 +177,28 @@ struct igu_window *igu_window_create(int width, int height)
     if (!window)
         return NULL;
 
-    if (x11_window_create(window, width, height) != 0)
+    memset(window, 0, sizeof(*window));
+    window->should_close = true;
+    printf(INFO "WINDOW: allocated memory for window structure\n");
+
+    if (igu_event_queue_init(&window->event_queue) != 0)
         goto err_free;
+
+    if (x11_window_create(window, width, height) != 0)
+        goto err_free_queue;
 
     window->renderer = gl_renderer_create();
     if (!window->renderer)
         goto err_destroy;
 
+    window->cursor = IGU_CURSOR_ARROW;
+
     return window;
 
 err_destroy:
     x11_window_destroy(window);
+err_free_queue:
+    igu_event_queue_free(&window->event_queue);
 err_free:
     free(window);
     return NULL;

@@ -15,6 +15,7 @@
 
 #include <glad/glx.h>
 
+#include <iguana/event.h>
 #include <iguana/widget.h>
 
 #define INFO    "[INFO] "
@@ -33,6 +34,7 @@ struct igu_window {
     struct igu_widget *widget;
 
     struct renderer *renderer;
+    struct igu_event_queue event_queue;
     bool should_close;
     bool should_redraw;
     float delta_time;
