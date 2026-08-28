@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_library(iguana
     "src/color.c"
     "src/container.c"
+    "src/event.c"
     "src/image.c"
     "src/renderer.c"
     "src/util.c"
