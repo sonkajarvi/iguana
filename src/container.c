@@ -16,6 +16,7 @@
 #include <iguana/widget.h>
 #include <iguana/window.h>
 
+#include "debug.h"
 #include "renderer.h"
 
 #define container_for_each_child(_container, _child)                          \
@@ -125,73 +126,32 @@ static void container_free(struct igu_widget *widget)
     free(container);
 }
 
-#define INDENT()                                \
-    do {                                        \
-        for (int i = 0; i < depth * 8; i++)     \
-            putchar(' ');                       \
-    } while (0)
-
-#define PRINT(fmt, ...)                 \
-    do {                                \
-        INDENT();                       \
-        printf(fmt, ##__VA_ARGS__);     \
-    } while (0)
-
-#define PRINT_VALUE(value_)                                                 \
-    do {                                                                    \
-        printf("%.1f", (value_).value);                                     \
-        if ((value_).value)                                                 \
-            printf("%s", (value_).type == IGU_VALUE_ABSOLUTE ? "px" : "%"); \
-    } while (0)
-
-#define PRINT_VALUES(fmt, values)                       \
-    do {                                                \
-        INDENT();                                       \
-        printf(fmt);                                    \
-        putchar(' '); PRINT_VALUE(IGU_TOP(values));     \
-        putchar(' '); PRINT_VALUE(IGU_RIGHT(values));   \
-        putchar(' '); PRINT_VALUE(IGU_BOTTOM(values));  \
-        putchar(' '); PRINT_VALUE(IGU_LEFT(values));    \
-        putchar('\n');                                  \
-    } while (0)
-
-#define ARGB(x)                 \
-    (IGU_COLOR_A(x) << 24 |     \
-     IGU_COLOR_R(x) << 16 |     \
-     IGU_COLOR_G(x) << 8  |     \
-     IGU_COLOR_B(x))
-
 static void container_print(struct igu_widget *widget, int depth)
 {
     struct igu_container *container = igu_container_of(widget,
                                                        struct igu_container,
                                                        widget);
-    struct igu_widget *tmp, *end;
-    const char *color;
-    igu_rect_t m_rect, mp_rect;
 
-    igu_widget_rect_with_margin(widget, m_rect);
-    igu_widget_rect_with_margin_and_padding(widget, mp_rect);
-    color = igu_color_to_string(container->background_color) ?: "";
+    igu_debug_print_label(depth, "container");
 
-    PRINT       ("container:\n");
-    PRINT       ("    this: %p\n", container);
-    PRINT       ("    parent: %p\n", widget->parent);
-    PRINT       ("    area: " IGU_RECT_FMT "\n", IGU_RECT_PRINT(widget->rect));
-    PRINT       ("          " IGU_RECT_FMT "\n", IGU_RECT_PRINT(m_rect));
-    PRINT       ("          " IGU_RECT_FMT "\n", IGU_RECT_PRINT(mp_rect));
-    PRINT       ("    name: %s\n", widget->name);
-    PRINT       ("    color: #%08x %s\n", ARGB(container->background_color),
-                 color);
-    PRINT_VALUES("    margin:", widget->margin);
-    PRINT_VALUES("    padding:", widget->padding);
-    PRINT       ("    direction: %s\n", container->direction ==
-                 IGU_CONTAINER_HORIZONTAL ? "row" : "column");
-    PRINT       ("    children: [%zu]\n", widget->num_children);
+    /* widget */
+    igu_debug_print_pointer(depth + 1, "this", container);
+    igu_debug_print_pointer(depth + 1, "parent", widget->parent);
+    igu_debug_print_string(depth + 1, "name", widget->name);
 
-    for (tmp = widget->children, end = tmp;
-         tmp && tmp->next != end; tmp = tmp->next)
-        __igu_widget_print(tmp, depth + 1);
+    /* styles */
+    igu_debug_print_color(depth + 1, "background-color",
+                          container->background_color);
+    igu_debug_print_value4(depth + 1, "margin", &widget->margin);
+    igu_debug_print_value4(depth + 1, "padding", &widget->padding);
+    igu_debug_print_string(depth + 1, "direction",
+                           container->direction == IGU_CONTAINER_HORIZONTAL ?
+                           "horizontal" : "vertical");
+
+    /* hierarchy */
+    igu_debug_print_children(depth + 1, "children", widget->num_children);
+    igu_widget_for_each_child(tmp, widget)
+        __igu_widget_print(tmp, depth + 2);
 }
 
 static const struct igu_widget_vtable container_vtable = {
