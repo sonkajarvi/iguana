@@ -22,6 +22,16 @@
     })
 
 /**
+ * igu_widget_for_each_child() - Iterate over a widget's children
+ * @name:       The name for the iterator
+ * @widget:     The widget to iterate over
+ */
+#define igu_widget_for_each_child(name, widget)                         \
+    for (struct igu_widget *name = (widget)->children, *__end = name;   \
+         name && name->next != __end;                                   \
+         name = name->next)
+
+/**
  * struct igu_widget - The base widget structure.
  * @vtable:  Pointer to the widget's virtual function table.
  * @parent:  Pointer to the parent widget; set by parent.
