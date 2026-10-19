@@ -12,6 +12,8 @@
 #include <time.h>
 
 #include <X11/Xlib.h>
+#include <X11/Xcursor/Xcursor.h>
+#include <X11/extensions/Xfixes.h>
 
 #include <iguana/event.h>
 #include <iguana/window.h>
@@ -258,4 +260,72 @@ void x11_window_swap_buffers(struct igu_window *window)
 {
     if (window)
         glXSwapBuffers(window->display, window->window);
+}
+
+static const char *x_cursor_files[] = {
+    [IGU_CURSOR_NONE]          = NULL,
+    [IGU_CURSOR_ARROW]         = "arrow",
+
+    [IGU_CURSOR_CONTEXT_MENU]  = "context-menu",
+    [IGU_CURSOR_HELP]          = "question_arrow",
+    [IGU_CURSOR_POINTER]       = "hand2",
+    [IGU_CURSOR_PROGRESS]      = "left_ptr_watch",
+    [IGU_CURSOR_WAIT]          = "watch",
+
+    [IGU_CURSOR_CELL]          = "cell",
+    [IGU_CURSOR_CROSSHAIR]     = "crosshair",
+    [IGU_CURSOR_TEXT]          = "xterm",
+    [IGU_CURSOR_VERTICAL_TEXT] = "vertical-text",
+
+    [IGU_CURSOR_ALIAS]         = "dnd-link",
+    [IGU_CURSOR_COPY]          = "copy",
+    [IGU_CURSOR_MOVE]          = "all-scroll",
+    [IGU_CURSOR_NO_DROP]       = "no-drop",
+    [IGU_CURSOR_NOT_ALLOWED]   = "not-allowed",
+    [IGU_CURSOR_GRAB]          = "grab",
+    [IGU_CURSOR_GRABBING]      = "grabbing",
+
+    [IGU_CURSOR_ALL_SCROLL]    = "all-scroll",
+    [IGU_CURSOR_COLUMN_RESIZE] = "sb_h_double_arrow",
+    [IGU_CURSOR_ROW_RESIZE]    = "sb_v_double_arrow",
+    [IGU_CURSOR_N_RESIZE]      = "top_side",
+    [IGU_CURSOR_E_RESIZE]      = "right_side",
+    [IGU_CURSOR_S_RESIZE]      = "bottom_side",
+    [IGU_CURSOR_W_RESIZE]      = "left_side",
+    [IGU_CURSOR_NE_RESIZE]     = "top_right_corner",
+    [IGU_CURSOR_NW_RESIZE]     = "top_left_corner",
+    [IGU_CURSOR_SE_RESIZE]     = "bottom_right_corner",
+    [IGU_CURSOR_SW_RESIZE]     = "bottom_left_corner",
+    [IGU_CURSOR_EW_RESIZE]     = "sb_h_double_arrow",
+    [IGU_CURSOR_NS_RESIZE]     = "sb_v_double_arrow",
+    [IGU_CURSOR_NESW_RESIZE]   = "bottom_left_corner",
+    [IGU_CURSOR_NWSE_RESIZE]   = "bottom_right_corner",
+
+    [IGU_CURSOR_ZOOM_IN]       = "zoom-in",
+    [IGU_CURSOR_ZOOM_OUT]      = "zoom-out",
+};
+
+int x11_window_set_cursor(struct igu_window *window, unsigned int cursor)
+{
+    Cursor x_cursor;
+
+    if (!window || cursor > IGU_CURSOR_LAST)
+        return -EINVAL;
+
+    if (cursor == IGU_CURSOR_NONE) {
+        XFixesHideCursor(window->display, window->window);
+        goto out;
+    }
+
+    x_cursor = XcursorLibraryLoadCursor(window->display,
+                                        x_cursor_files[cursor]);
+    XDefineCursor(window->display, window->window, x_cursor);
+
+    if (window->cursor == IGU_CURSOR_NONE)
+        XFixesShowCursor(window->display, window->window);
+
+out:
+    window->cursor = cursor;
+
+    return 0;
 }

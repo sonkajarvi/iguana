@@ -40,6 +40,8 @@ target_include_directories(iguana PRIVATE
 )
 
 target_link_libraries(iguana PRIVATE
+    "Xfixes"
+    "Xcursor"
     "X11"
 )
 

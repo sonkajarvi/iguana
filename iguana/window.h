@@ -90,6 +90,7 @@ struct igu_window {
     int mouse_x, mouse_x_delta, mouse_x_prev;
     int mouse_y, mouse_y_delta, mouse_y_prev;
     struct igu_widget *hovered;
+    unsigned int cursor;
 
     /* X11 */
     Display *display;
@@ -112,6 +113,19 @@ void x11_window_swap_buffers(struct igu_window *window);
 void x11_window_poll_events(struct igu_window *window);
 
 double x11_window_get_time(struct igu_window *window);
+
+/**
+ * x11_window_set_cursor - modify the state of the window cursor
+ * @window:         The window the cursor belongs to
+ * @cursor:         New cursor state
+ *
+ * Sets the cursor to the given shape, unless IGU_CURSOR_NONE is passed, in
+ * which case the cursor is hidden. Passing any of the other options makes
+ * the cursor visible again.
+ *
+ * Returns 0 if successful, a negative error code otherwise.
+ */
+int x11_window_set_cursor(struct igu_window *window, unsigned int cursor);
 
 /*
  * GLX context
