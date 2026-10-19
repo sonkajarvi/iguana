@@ -26,6 +26,7 @@ enum {
     IGU_EVENT_TYPE_MOUSE_SCROLL,
     IGU_EVENT_TYPE_WINDOW_MOVE,
     IGU_EVENT_TYPE_WINDOW_RESIZE,
+    IGU_EVENT_TYPE_WINDOW_CLOSE,
 };
 
 struct igu_event {
@@ -103,5 +104,6 @@ int igu_event_queue_push_window_move_event(struct igu_event_queue *queue,
                                            int x, int y);
 int igu_event_queue_push_window_resize_event(struct igu_event_queue *queue,
                                              int width, int height);
+int igu_event_queue_push_window_close_event(struct igu_event_queue *queue);
 
 #endif /* !_IGUANA_EVENT_H */

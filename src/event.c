@@ -168,3 +168,15 @@ int igu_event_queue_push_window_resize_event(struct igu_event_queue *queue,
 
     return igu_event_queue_push(queue, &event);
 }
+
+int igu_event_queue_push_window_close_event(struct igu_event_queue *queue)
+{
+    struct igu_event event;
+
+    if (!queue)
+        return -EINVAL;
+
+    event.type = IGU_EVENT_TYPE_WINDOW_CLOSE;
+
+    return igu_event_queue_push(queue, &event);
+}
