@@ -240,6 +240,7 @@ static void __igu_platform_window_poll_events(
         switch (event.type) {
         case ClientMessage:
             if ((Atom)event.xclient.data.l[0] == wm_delete_window) {
+                igu_event_queue_push_window_close_event(&pwindow->event_queue);
                 return;
             }
             break;

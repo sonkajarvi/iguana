@@ -135,6 +135,10 @@ static void igu_window_handle_events(struct igu_window *window)
         window->should_redraw = true;
         break;
 
+    case IGU_EVENT_TYPE_WINDOW_CLOSE:
+        window->should_close = true;
+        break;
+
     default:
         break;
     }
