@@ -14,6 +14,7 @@
 
 #include <iguana/event.h>
 #include <iguana/rect.h>
+#include <iguana/platform_window.h>
 #include <iguana/widget.h>
 #include <iguana/window.h>
 
@@ -62,18 +63,23 @@ static struct igu_widget *igu_window_hit_test(struct igu_window *window)
 
     if (window->hovered) {
         igu_widget_rect_with_margin(window->hovered, rect);
-        if (igu_rect_point_in_rect(rect, window->mouse_x, window->mouse_y))
+        if (igu_rect_point_in_rect(rect,
+                                   window->pwindow->mouse_x,
+                                   window->pwindow->mouse_y))
             widget = window->hovered;
     }
 
-    return test_hit_vertical(widget, window->mouse_x, window->mouse_y);
+    return test_hit_vertical(widget,
+                             window->pwindow->mouse_x,
+                             window->pwindow->mouse_y);
 }
 
 static void igu_window_compute_hovered_widget(struct igu_window *window)
 {
     struct igu_widget *hit;
 
-    if (window->mouse_x_delta == 0 && window->mouse_y_delta == 0)
+    if (window->pwindow->mouse_x_delta == 0 &&
+        window->pwindow->mouse_y_delta == 0)
         return;
 
     hit = igu_window_hit_test(window);
@@ -89,7 +95,7 @@ static void igu_window_handle_events(struct igu_window *window)
     struct igu_event event;
     int ret;
 
-    ret = igu_event_queue_pop(&window->event_queue, &event);
+    ret = igu_event_queue_pop(&window->pwindow->event_queue, &event);
     if (ret == -ENOENT)
         return;
     if (ret < 0) {
@@ -102,27 +108,29 @@ static void igu_window_handle_events(struct igu_window *window)
         break;
 
     case IGU_EVENT_TYPE_MOUSE_MOVE:
-        window->mouse_x_prev = window->mouse_x;
-        window->mouse_y_prev = window->mouse_y;
+        window->pwindow->mouse_x_prev = window->pwindow->mouse_x;
+        window->pwindow->mouse_y_prev = window->pwindow->mouse_y;
 
-        window->mouse_x = event.mouse_move.x;
-        window->mouse_y = event.mouse_move.y;
+        window->pwindow->mouse_x = event.mouse_move.x;
+        window->pwindow->mouse_y = event.mouse_move.y;
 
-        window->mouse_x_delta = window->mouse_x - window->mouse_x_prev;
-        window->mouse_y_delta = window->mouse_y - window->mouse_y_prev;
+        window->pwindow->mouse_x_delta = window->pwindow->mouse_x -
+                                         window->pwindow->mouse_x_prev;
+        window->pwindow->mouse_y_delta = window->pwindow->mouse_y -
+                                         window->pwindow->mouse_y_prev;
         break;
 
     case IGU_EVENT_TYPE_MOUSE_SCROLL:
         break;
 
     case IGU_EVENT_TYPE_WINDOW_MOVE:
-        window->x = event.window_move.x;
-        window->y = event.window_move.y;
+        window->pwindow->x = event.window_move.x;
+        window->pwindow->y = event.window_move.y;
         break;
 
     case IGU_EVENT_TYPE_WINDOW_RESIZE:
-        window->width = event.window_resize.width;
-        window->height = event.window_resize.height;
+        window->pwindow->width = event.window_resize.width;
+        window->pwindow->height = event.window_resize.height;
 
         window->should_redraw = true;
         break;
@@ -134,20 +142,22 @@ static void igu_window_handle_events(struct igu_window *window)
 
 int igu_window_exec(struct igu_window *window)
 {
-    x11_window_show(window);
+    igu_platform_window_show(window->pwindow);
+    window->should_close = false;
+    window->should_redraw = true;
 
     if (window->widget)
         window->widget->window = window;
 
     while (!window->should_close) {
-        x11_window_poll_events(window);
+        igu_platform_window_poll_events(window->pwindow);
 
         if (window->should_redraw) {
             renderer_new_frame(window->renderer, window);
 
             if (window->widget) {
-                IGU_WIDTH(window->widget->rect) = window->width;
-                IGU_HEIGHT(window->widget->rect) = window->height;
+                IGU_WIDTH(window->widget->rect) = window->pwindow->width;
+                IGU_HEIGHT(window->widget->rect) = window->pwindow->height;
 
                 igu_widget_relayout(window->widget);
                 igu_widget_redraw(window->widget);
@@ -156,7 +166,7 @@ int igu_window_exec(struct igu_window *window)
             renderer_flush_vertices(window->renderer);
             window->should_redraw = false;
 
-            x11_window_swap_buffers(window);
+            igu_platform_window_swap_buffers(window->pwindow);
         }
 
         igu_window_compute_hovered_widget(window);
@@ -164,7 +174,7 @@ int igu_window_exec(struct igu_window *window)
         igu_window_handle_events(window);
     }
 
-    x11_window_destroy(window);
+    igu_platform_window_destroy(window->pwindow);
 
     return 0;
 }
@@ -181,24 +191,22 @@ struct igu_window *igu_window_create(int width, int height)
     window->should_close = true;
     printf(INFO "WINDOW: allocated memory for window structure\n");
 
-    if (igu_event_queue_init(&window->event_queue) != 0)
+    window->pwindow = igu_platform_window_create(width, height);
+    if (!window->pwindow)
         goto err_free;
-
-    if (x11_window_create(window, width, height) != 0)
-        goto err_free_queue;
 
     window->renderer = gl_renderer_create();
     if (!window->renderer)
         goto err_destroy;
 
-    window->cursor = IGU_CURSOR_ARROW;
+    window->pwindow->cursor = IGU_CURSOR_ARROW;
+    window->should_close = true;
+    window->should_redraw = false;
 
     return window;
 
 err_destroy:
-    x11_window_destroy(window);
-err_free_queue:
-    igu_event_queue_free(&window->event_queue);
+    igu_platform_window_destroy(window->pwindow);
 err_free:
     free(window);
     return NULL;

@@ -25,7 +25,7 @@ add_library(iguana
     "src/gl/glx_context.c"
 
     # x11
-    "src/x11/x11_window.c"
+    "src/x11/x11_platform_window.c"
 
     # glad sources
     "third_party/glad/src/gl.c"

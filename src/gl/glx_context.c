@@ -12,13 +12,14 @@
 #include <glad/gl.h>
 #include <glad/glx.h>
 
+#include <iguana/platform_window.h>
 #include <iguana/window.h>
 
-static int glx_load_functions(struct igu_window *window, int screen)
+static int glx_load_functions(struct igu_platform_window *pwindow, int screen)
 {
     int version;
 
-    version = gladLoadGLX(window->display, screen, gl_get_proc_address);
+    version = gladLoadGLX(pwindow->x11.display, screen, gl_get_proc_address);
     if (!version) {
         printf(ERROR "GLX: failed to load functions\n");
         return -1;
@@ -45,7 +46,7 @@ static const int fbconfig_attribs[] = {
     None
 };
 
-static int glx_choose_fbconfig(struct igu_window *window, int screen,
+static int glx_choose_fbconfig(struct igu_platform_window *pwindow, int screen,
                                GLXFBConfig *fbc)
 {
     GLXFBConfig *configs;
@@ -53,7 +54,8 @@ static int glx_choose_fbconfig(struct igu_window *window, int screen,
     int count, buffers, samples;
     int best, best_samples, worst, worst_samples;
 
-    configs = glXChooseFBConfig(window->display, screen, fbconfig_attribs, &count);
+    configs = glXChooseFBConfig(pwindow->x11.display,
+                                screen, fbconfig_attribs, &count);
     if (!configs) {
         printf(ERROR "GLX: failed to choose FB config\n");
         return -1;
@@ -61,11 +63,11 @@ static int glx_choose_fbconfig(struct igu_window *window, int screen,
 
     best = -1, worst = -1, best_samples = -1, worst_samples = 999;
     for (int i = 0; i < count; i++) {
-        vi = glXGetVisualFromFBConfig(window->display, configs[i]);
+        vi = glXGetVisualFromFBConfig(pwindow->x11.display, configs[i]);
         if (vi) {
-            glXGetFBConfigAttrib(window->display, configs[i],
+            glXGetFBConfigAttrib(pwindow->x11.display, configs[i],
                                  GLX_SAMPLE_BUFFERS, &buffers);
-            glXGetFBConfigAttrib(window->display, configs[i], GLX_SAMPLES,
+            glXGetFBConfigAttrib(pwindow->x11.display, configs[i], GLX_SAMPLES,
                                  &samples);
 
             if (best < 0 || (buffers && samples > best_samples)) {
@@ -93,15 +95,17 @@ static const int context_attribs[] = {
     None
 };
 
-int glx_create_context(struct igu_window *window)
+int glx_create_context(struct igu_platform_window *pwindow)
 {
-    window->context = glXCreateContextAttribsARB(window->display,
-                                                 window->fbconfig, NULL, True,
-                                                 context_attribs);
-    if (!window->context)
+    pwindow->glx.context = glXCreateContextAttribsARB(pwindow->x11.display,
+                                                      pwindow->glx.fbconfig,
+                                                      NULL, True,
+                                                      context_attribs);
+    if (!pwindow->glx.context)
         goto err;
 
-    if (!glXMakeCurrent(window->display, window->window, window->context))
+    if (!glXMakeCurrent(pwindow->x11.display,
+                        pwindow->x11.window, pwindow->glx.context))
         goto err;
 
     return 0;
@@ -111,24 +115,24 @@ err:
     return -1;
 }
 
-void glx_destroy_context(struct igu_window *window)
+void glx_destroy_context(struct igu_platform_window *pwindow)
 {
-    glXMakeCurrent(window->display, None, NULL);
-    glXDestroyContext(window->display, window->context);
+    glXMakeCurrent(pwindow->x11.display, None, NULL);
+    glXDestroyContext(pwindow->x11.display, pwindow->glx.context);
 
     printf(INFO "GLX: context destroyed\n");
 }
 
-XVisualInfo *glx_get_visual(struct igu_window *window)
+XVisualInfo *glx_get_visual(struct igu_platform_window *pwindow)
 {
     int screen;
 
-    screen = DefaultScreen(window->display);
-    if (glx_load_functions(window, screen) != 0)
+    screen = DefaultScreen(pwindow->x11.display);
+    if (glx_load_functions(pwindow, screen) != 0)
         return NULL;
 
-    if (glx_choose_fbconfig(window, screen, &window->fbconfig) != 0)
+    if (glx_choose_fbconfig(pwindow, screen, &pwindow->glx.fbconfig) != 0)
         return NULL;
 
-    return glXGetVisualFromFBConfig(window->display, window->fbconfig);
+    return glXGetVisualFromFBConfig(pwindow->x11.display, pwindow->glx.fbconfig);
 }

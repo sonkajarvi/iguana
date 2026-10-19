@@ -9,11 +9,6 @@
 #define _IGUANA_WINDOW_H
 
 #include <stdbool.h>
-#include <stdint.h>
-
-#include <X11/X.h>
-
-#include <glad/glx.h>
 
 #include <iguana/event.h>
 #include <iguana/widget.h>
@@ -72,74 +67,19 @@ enum {
 
 /**
  * struct igu_window - The window structure
- *
- * TODO: Separate the X11 and GLX stuff from the generic stuff.
  */
 struct igu_window {
-    struct igu_widget *widget;
-
-    struct renderer *renderer;
-    struct igu_event_queue event_queue;
     bool should_close;
     bool should_redraw;
-    float delta_time;
-    int fps;
 
-    int x, y;
-    int width, height;
-    int mouse_x, mouse_x_delta, mouse_x_prev;
-    int mouse_y, mouse_y_delta, mouse_y_prev;
+    struct igu_platform_window *pwindow;
+    struct renderer *renderer;
+
+    struct igu_widget *widget;
     struct igu_widget *hovered;
-    unsigned int cursor;
-
-    /* X11 */
-    Display *display;
-    Window root;
-    Window window;
-    uint64_t time_offset;
-
-    /* GLX */
-    GLXContext context;
-    GLXFBConfig fbconfig;
 };
 
 int igu_window_exec(struct igu_window *window);
 struct igu_window *igu_window_create(int width, int height);
-
-int x11_window_create(struct igu_window *window, int width, int height);
-void x11_window_destroy(struct igu_window *window);
-void x11_window_show(struct igu_window *window);
-void x11_window_swap_buffers(struct igu_window *window);
-void x11_window_poll_events(struct igu_window *window);
-
-double x11_window_get_time(struct igu_window *window);
-
-/**
- * x11_window_set_cursor - modify the state of the window cursor
- * @window:         The window the cursor belongs to
- * @cursor:         New cursor state
- *
- * Sets the cursor to the given shape, unless IGU_CURSOR_NONE is passed, in
- * which case the cursor is hidden. Passing any of the other options makes
- * the cursor visible again.
- *
- * Returns 0 if successful, a negative error code otherwise.
- */
-int x11_window_set_cursor(struct igu_window *window, unsigned int cursor);
-
-/*
- * GLX context
- */
-XVisualInfo *glx_get_visual(struct igu_window *window);
-int glx_create_context(struct igu_window *window);
-void glx_destroy_context(struct igu_window *window);
-
-/*
- * GL context
- */
-GLADapiproc gl_get_proc_address(const char *name);
-int gl_load_functions(void);
-int gl_open_handle(void);
-void gl_close_handle(void);
 
 #endif /* !_IGUANA_WINDOW_H */

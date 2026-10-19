@@ -11,9 +11,11 @@
 #include <string.h>
 
 #include <glad/gl.h>
+#include <glad/glx.h>
 
 #include <iguana/color.h>
 #include <iguana/image.h>
+#include <iguana/platform_window.h>
 #include <iguana/window.h>
 
 #include "../renderer.h"
@@ -41,7 +43,8 @@ static void gl_renderer_new_frame(struct renderer *renderer,
     XWindowAttributes wa;
 
     /* TODO: do not call X11 directly here */
-    XGetWindowAttributes(window->display, window->window, &wa);
+    XGetWindowAttributes(window->pwindow->x11.display,
+                         window->pwindow->x11.window, &wa);
     glViewport(0, 0, wa.width, wa.height);
 
     glEnable(GL_BLEND);
